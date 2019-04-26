@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
+title: 点滴
+subtitle: 记录每一天
+description: 不积跬步,无以至千里;不积小流,无以成江海。
 keywords:
-author: John Doe
-language:
+author: Luckyvon
+language: zh-CN
 timezone:
 
 # URL
@@ -78,4 +78,6 @@ theme: landscape
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/luckyvon/luckyvon.github.io.git
+  branch: master
