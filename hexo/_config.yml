@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
-keywords:
-author: John Doe
-language:
+title: 点滴
+subtitle: 记录每一天
+description: 不积跬步,无以至千里;不积小流,无以成江海。
+keywords: Developer, iOS
+author: Luckyvon
+language: zh-CN
 timezone:
 
 # URL
