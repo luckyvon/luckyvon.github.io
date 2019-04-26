@@ -158,10 +158,10 @@ baidu_push: false
 # External url should start with http:// or https://
 menu:
   home: / || home
-  tags: /tags/ || tags
-  categories: /categories/ || th
+  #about: /about/ || user
+  #tags: /tags/ || tags
+  #categories: /categories/ || th
   archives: /archives/ || archive
-  about: /about/ || user
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
@@ -177,10 +177,10 @@ menu_settings:
 # ---------------------------------------------------------------
 
 # Schemes
-# scheme: Muse
+scheme: Muse
 #scheme: Mist
 #scheme: Pisces
-scheme: Gemini
+#scheme: Gemini
 
 
 # ---------------------------------------------------------------
@@ -262,7 +262,7 @@ sidebar:
   #  - always  expand for all pages automatically.
   #  - hide    expand only when click on the sidebar toggle icon.
   #  - remove  totally remove sidebar including sidebar toggle.
-  display: always
+  display: post
 
   # Sidebar offset from top menubar in pixels (only for Pisces | Gemini).
   offset: 12
@@ -274,9 +274,9 @@ sidebar:
 back2top:
   enable: true
   # Back to top in sidebar.
-  sidebar: ture
+  sidebar: false
   # Scroll percent label in b2t button.
-  scrollpercent: true
+  scrollpercent: false
 
 # A button to open designated chat widget in sidebar.
 # Firstly, you need enable the chat service you want to activate its sidebar button.
