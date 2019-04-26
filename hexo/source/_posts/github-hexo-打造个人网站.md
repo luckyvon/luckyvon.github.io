@@ -8,7 +8,7 @@ tags:
 - github
 ---
 
-![](github-hexo-打造个人网站/hexo_header.jpg)
+![](./github-hexo-打造个人网站/hexo_header.jpg)
 
 # 前言
 
