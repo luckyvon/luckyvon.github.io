@@ -41,7 +41,7 @@ tags:
 
 # 遇到的问题
 
-## 多台电脑同时同时编辑
+## 多台电脑同时编辑
 
 [多台电脑上提交和更新Hexo](https://www.jianshu.com/p/0b1fccce74e0)  
 
