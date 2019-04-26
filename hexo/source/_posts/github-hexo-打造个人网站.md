@@ -46,3 +46,7 @@ tags:
 [多台电脑上提交和更新Hexo](https://www.jianshu.com/p/0b1fccce74e0)  
 
 和这位博主不同，我的切分下载到本地之后，将文件全都删掉，只留.git文件（不然没法git同步。。。）然后用hexo init hexo 在分支文件夹内新建一个hexo文件夹，然后将next主题下载到themes文件夹中。需要将next文件夹中的.git删除（属于不同的仓库，不删除的话，无法用git add .添加）。然后将所有文件提交。新建hexo，会带一个gitignore忽略配置文件。将node_modules文件夹忽略了，在别的电脑下载下来这个分支之后，需要cd 到 hexo并运行npm install安装node_modules
+
+## 显示图片
+
+[Hexo-Next如何在文章摘要展示图片](https://faithlove.github.io/2018/07/18/Hexo-Next如何在文章摘要展示图片/)
