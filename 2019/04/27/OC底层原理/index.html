@@ -129,7 +129,30 @@
 <meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.4_1.png">
 <meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/4/4.2_1.png">
 <meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/4/4.3_1.png">
-<meta property="og:updated_time" content="2019-04-27T12:23:28.862Z">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/5/5.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/6/6.3_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/6/6.4_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/6/6.4_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.2_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.2_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.3_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.3_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.3_3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.5_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.7_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.8_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.8_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.8_3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.8_4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.9_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.10_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.12_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.12.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.12.1_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.12.2_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/7/7.12.2_2.png">
+<meta property="og:updated_time" content="2019-04-27T16:02:15.702Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OC底层原理">
 <meta name="twitter:description" content="1、OC对象的本质1.1 OC底层实现我们平时编写的Objective-C代码，底层实现其实都是C\C++代码。Objective-C的对象、类主要是基于C\C++的结构体实现。  1.2 将Objective-C代码转换为C\C++代码 xcrun  -sdk  iphoneos  clang  -arch  arm64  -rewrite-objc  OC源文件  -o  输出的CPP文件。如">
@@ -451,7 +474,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">11k</span>
+                <span title="本文字数">16k</span>
               
 
               
@@ -465,7 +488,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">10 分钟</span>
+                <span title="阅读时长">15 分钟</span>
               
             </div>
           
@@ -573,6 +596,189 @@
 <li>accessInstanceVariablesDirectly方法的默认返回值是YES</li>
 </ul>
 <h2 id="4-3-valueForKey-的原理"><a href="#4-3-valueForKey-的原理" class="headerlink" title="4.3 valueForKey:的原理"></a>4.3 valueForKey:的原理</h2><p><img src="/2019/04/27/OC底层原理/4/4.3_1.png" alt></p>
+<h2 id="面试题-3"><a href="#面试题-3" class="headerlink" title="面试题"></a>面试题</h2><h3 id="通过KVC修改属性会触发KVO么？"><a href="#通过KVC修改属性会触发KVO么？" class="headerlink" title="通过KVC修改属性会触发KVO么？"></a>通过KVC修改属性会触发KVO么？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">通过kvo监听某个属性，如果修改属性，会触发kvo，如果用 -&gt; 直接修改成员变量，不会触发KVO。</span><br><span class="line">如果通过kvc修改类的变量，不管是属性还是成员变量，只用通过kvo监听这个变量都很触发kvo。（即都很收到属性变化的通知）</span><br><span class="line">kvo监听某个属性，系统通过runtime生成NSKVONotififying_XXX子类重写set方法。发通知（见上面kvo原理）</span><br><span class="line">kvc在setValue:forKey/setValue:forKeyPath中调用willChangeValueForKey、didChangeValueForKey（必须成对出现，要不然不会发通知），在didChangeValueForKey中会发通知变量改变</span><br></pre></td></tr></table></figure>
+<h3 id="KVC的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC的赋值和取值过程是怎样的？原理是什么？"></a>KVC的赋值和取值过程是怎样的？原理是什么？</h3><h1 id="5、Category"><a href="#5、Category" class="headerlink" title="5、Category"></a>5、Category</h1><h2 id="5-1-Category的底层结构"><a href="#5-1-Category的底层结构" class="headerlink" title="5.1 Category的底层结构"></a>5.1 Category的底层结构</h2><p>定义在objc-runtime-new.h中</p>
+<p><img src="/2019/04/27/OC底层原理/5/5.1_1.png" alt></p>
+<h2 id="5-2-Category的加载处理过程"><a href="#5-2-Category的加载处理过程" class="headerlink" title="5.2 Category的加载处理过程"></a>5.2 Category的加载处理过程</h2><ol>
+<li>通过Runtime加载某个类的所有Category数据</li>
+<li>把所有Category的方法、属性、协议数据，合并到一个大数组中<br>后面参与编译的Category数据，会在数组的前面</li>
+<li>将合并后的分类数据（方法、属性、协议），插入到类原来数据的前面</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">源码解读顺序</span><br><span class="line">objc-os.mm</span><br><span class="line">_objc_init</span><br><span class="line">map_images</span><br><span class="line">map_images_nolock</span><br><span class="line"></span><br><span class="line">objc-runtime-new.mm</span><br><span class="line">_read_images</span><br><span class="line">remethodizeClass</span><br><span class="line">attachCategories</span><br><span class="line">attachLists</span><br><span class="line">realloc、memmove、 memcpy</span><br></pre></td></tr></table></figure>
+<h2 id="5-3-load方法"><a href="#5-3-load方法" class="headerlink" title="5.3 +load方法"></a>5.3 +load方法</h2><ul>
+<li>+load方法会在runtime加载类、分类时调用</li>
+<li>每个类、分类的+load，在程序运行过程中只调用一次</li>
+<li>调用顺序<ol>
+<li>先调用类的+load<ol>
+<li>按照编译先后顺序调用（先编译，先调用）</li>
+<li>调用子类的+load之前会先调用父类的+load</li>
+</ol>
+</li>
+<li>再调用分类的+load<ol>
+<li>按照编译先后顺序调用（先编译，先调用）</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">objc4源码解读过程：objc-os.mm</span><br><span class="line">_objc_init</span><br><span class="line"></span><br><span class="line">load_images</span><br><span class="line"></span><br><span class="line">prepare_load_methods</span><br><span class="line">schedule_class_load</span><br><span class="line">add_class_to_loadable_list</span><br><span class="line">add_category_to_loadable_list</span><br><span class="line"></span><br><span class="line">call_load_methods</span><br><span class="line">call_class_loads</span><br><span class="line">call_category_loads</span><br><span class="line">(*load_method)(cls, SEL_load)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>+load方法是根据方法地址直接调用，并不是经过objc_msgSend函数调用</li>
+</ul>
+<h2 id="5-4-initialize方法"><a href="#5-4-initialize方法" class="headerlink" title="5.4 +initialize方法"></a>5.4 +initialize方法</h2><ul>
+<li>+initialize方法会在类第一次接收到消息时调用</li>
+<li>调用顺序<ol>
+<li>先调用父类的+initialize，再调用子类的+initialize</li>
+<li>(先初始化父类，再初始化子类，每个类只会初始化1次)</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">objc4源码解读过程</span><br><span class="line">objc-msg-arm64.s</span><br><span class="line">objc_msgSend</span><br><span class="line"></span><br><span class="line">objc-runtime-new.mm</span><br><span class="line">class_getInstanceMethod</span><br><span class="line">lookUpImpOrNil</span><br><span class="line">lookUpImpOrForward</span><br><span class="line">_class_initialize</span><br><span class="line">callInitialize</span><br><span class="line">objc_msgSend(cls, SEL_initialize)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>+initialize和+load的很大区别是，+initialize是通过objc_msgSend进行调用的，所以有以下特点:<ul>
+<li>如果子类没有实现+initialize，会调用父类的+initialize（所以父类的+initialize可能会被调用多次）</li>
+<li>如果分类实现了+initialize，就覆盖类本身的+initialize调用</li>
+</ul>
+</li>
+</ul>
+<h1 id="6、关联对象"><a href="#6、关联对象" class="headerlink" title="6、关联对象"></a>6、关联对象</h1><h2 id="6-1-如何实现给分类“添加成员变量”？"><a href="#6-1-如何实现给分类“添加成员变量”？" class="headerlink" title="6.1 如何实现给分类“添加成员变量”？"></a>6.1 如何实现给分类“添加成员变量”？</h2><p>默认情况下，因为分类底层结构的限制，不能添加成员变量到分类中。但可以通过关联对象来间接实现<br>关联对象提供了以下API:<br>1、添加关联对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void objc_setAssociatedObject(id object, const void * key, id value, objc_AssociationPolicy policy)</span><br></pre></td></tr></table></figure>
+<p>2、获得关联对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id objc_getAssociatedObject(id object, const void * key</span><br></pre></td></tr></table></figure>
+<p>3、移除所有的关联对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void objc_removeAssociatedObjects(id object)</span><br></pre></td></tr></table></figure>
+<h2 id="6-2-key的常见用"><a href="#6-2-key的常见用" class="headerlink" title="6.2 key的常见用"></a>6.2 key的常见用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">static void *MyKey = &amp;MyKey;</span><br><span class="line">objc_setAssociatedObject(obj, MyKey, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)</span><br><span class="line">objc_getAssociatedObject(obj, MyKey)</span><br><span class="line"></span><br><span class="line">static char MyKey;</span><br><span class="line">objc_setAssociatedObject(obj, &amp;MyKey, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)</span><br><span class="line">objc_getAssociatedObject(obj, &amp;MyKey)</span><br><span class="line"></span><br><span class="line">使用属性名作为key</span><br><span class="line">objc_setAssociatedObject(obj, @&quot;property&quot;, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">objc_getAssociatedObject(obj, @&quot;property&quot;);</span><br><span class="line"></span><br><span class="line">使用get方法的@selecor作为key</span><br><span class="line">objc_setAssociatedObject(obj, @selector(getter), value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)</span><br><span class="line">objc_getAssociatedObject(obj, @selector(getter))</span><br></pre></td></tr></table></figure>
+<h2 id="6-3-objc-AssociationPolicy"><a href="#6-3-objc-AssociationPolicy" class="headerlink" title="6.3 objc_AssociationPolicy"></a>6.3 objc_AssociationPolicy</h2><p><img src="/2019/04/27/OC底层原理/6/6.3_1.png" alt></p>
+<h2 id="6-4-关联对象的原理"><a href="#6-4-关联对象的原理" class="headerlink" title="6.4 关联对象的原理"></a>6.4 关联对象的原理</h2><p>实现关联对象技术的核心对象有</p>
+<ul>
+<li>AssociationsManager</li>
+<li>AssociationsHashMap</li>
+<li>ObjectAssociationMap</li>
+<li>ObjcAssociation</li>
+</ul>
+<p>objc4源码解读：objc-references.mm</p>
+<p><img src="/2019/04/27/OC底层原理/6/6.4_1.png" alt><br><img src="/2019/04/27/OC底层原理/6/6.4_2.png" alt></p>
+<h1 id="7、Block"><a href="#7、Block" class="headerlink" title="7、Block"></a>7、Block</h1><h2 id="7-1-block的本质"><a href="#7-1-block的本质" class="headerlink" title="7.1 block的本质"></a>7.1 block的本质</h2><ul>
+<li>block本质上也是一个OC对象，它内部也有个isa指针</li>
+<li>是封装了函数调用以及函数调用环境的OC对象</li>
+<li>block的底层结构如图所示</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.1_1.png" alt></p>
+<h2 id="7-2-block的变量捕获（capture）"><a href="#7-2-block的变量捕获（capture）" class="headerlink" title="7.2 block的变量捕获（capture）"></a>7.2 block的变量捕获（capture）</h2><ul>
+<li>为了保证block内部能够正常访问外部的变量，block有个变量捕获机制</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.2_1.png" alt></p>
+<ul>
+<li>auto变量的捕获</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.2_2.png" alt></p>
+<h2 id="7-3-block的类型"><a href="#7-3-block的类型" class="headerlink" title="7.3 block的类型"></a>7.3 block的类型</h2><p>block有3种类型，可以通过调用class方法或者isa指针查看具体类型，最终都是继承自NSBlock类型</p>
+<ul>
+<li><strong>NSGlobalBlock</strong> （ _NSConcreteGlobalBlock ）</li>
+<li><strong>NSStackBlock</strong> （ _NSConcreteStackBlock ）</li>
+<li><strong>NSMallocBlock</strong> （ _NSConcreteMallocBlock ）</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.3_1.png" alt></p>
+<p><img src="/2019/04/27/OC底层原理/7/7.3_2.png" alt></p>
+<p>每一种类型的block调用copy后的结果如下所示</p>
+<p><img src="/2019/04/27/OC底层原理/7/7.3_3.png" alt></p>
+<h2 id="7-4-block的copy"><a href="#7-4-block的copy" class="headerlink" title="7.4 block的copy"></a>7.4 block的copy</h2><p>在ARC环境下，编译器会根据情况自动将栈上的block复制到堆上，比如以下情况</p>
+<ul>
+<li>block作为函数返回值时</li>
+<li>将block赋值给__strong指针时</li>
+<li>block作为Cocoa API中方法名含有usingBlock的方法参数时</li>
+<li>block作为GCD API的方法参数时</li>
+</ul>
+<p>MRC下block属性的建议写法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@property (copy, nonatomic) void (^block)(void);</span><br></pre></td></tr></table></figure></p>
+<p>ARC下block属性的建议写法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@property (strong, nonatomic) void (^block)(void);</span><br><span class="line">@property (copy, nonatomic) void (^block)(void);</span><br></pre></td></tr></table></figure>
+<h2 id="7-5-对象类型的auto变量"><a href="#7-5-对象类型的auto变量" class="headerlink" title="7.5 对象类型的auto变量"></a>7.5 对象类型的auto变量</h2><p>当block内部访问了对象类型的auto变量时</p>
+<ul>
+<li>如果block是在栈上，将不会对auto变量产生强引用</li>
+<li>如果block被拷贝到堆上<ul>
+<li>会调用block内部的copy函数</li>
+<li>copy函数内部会调用_Block_object_assign函数</li>
+<li>_Block_object_assign函数会根据auto变量的修饰符（<strong>strong、</strong>weak、__unsafe_unretained）做出相应的操作，形成强引用（retain）或者弱引用</li>
+</ul>
+</li>
+<li>如果block从堆上移除<ul>
+<li>会调用block内部的dispose函数</li>
+<li>dispose函数内部会调用_Block_object_dispose函数</li>
+<li>_Block_object_dispose函数会自动释放引用的auto变量（release）</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.5_1.png" alt></p>
+<h2 id="7-6-weak问题解决"><a href="#7-6-weak问题解决" class="headerlink" title="7.6 __weak问题解决"></a>7.6 __weak问题解决</h2><p>在使用clang转换OC为C++代码时，可能会遇到以下问题</p>
+<blockquote>
+<p>cannot create __weak reference in file using manual reference</p>
+</blockquote>
+<p>解决方案：支持ARC、指定运行时系统版本，比如</p>
+<blockquote>
+<p>xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m</p>
+</blockquote>
+<h2 id="7-7-block修饰符"><a href="#7-7-block修饰符" class="headerlink" title="7.7 __block修饰符"></a>7.7 __block修饰符</h2><p><img src="/2019/04/27/OC底层原理/7/7.7_1.png" alt></p>
+<h2 id="7-8-block的内存管理"><a href="#7-8-block的内存管理" class="headerlink" title="7.8 __block的内存管理"></a>7.8 __block的内存管理</h2><ul>
+<li>当block在栈上时，并不会对__block变量产生强引用</li>
+<li>当block被copy到堆时<ul>
+<li>会调用block内部的copy函数</li>
+<li>copy函数内部会调用_Block_object_assign函数</li>
+<li>_Block_object_assign函数会对__block变量形成强引用（retain）</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.8_1.png" alt><br><img src="/2019/04/27/OC底层原理/7/7.8_2.png" alt></p>
+<ul>
+<li>当block从堆中移除时<ul>
+<li>会调用block内部的dispose函数</li>
+<li>dispose函数内部会调用_Block_object_dispose函数</li>
+<li>_Block_object_dispose函数会自动释放引用的__block变量（release)<br><img src="/2019/04/27/OC底层原理/7/7.8_3.png" alt><br><img src="/2019/04/27/OC底层原理/7/7.8_4.png" alt></li>
+</ul>
+</li>
+</ul>
+<h2 id="7-9-block的forwarding指针"><a href="#7-9-block的forwarding指针" class="headerlink" title="7.9 block的forwarding指针"></a>7.9 <strong>block的</strong>forwarding指针</h2><p><img src="/2019/04/27/OC底层原理/7/7.9_1.png" alt></p>
+<h2 id="7-10-对象类型的auto变量、-block变量"><a href="#7-10-对象类型的auto变量、-block变量" class="headerlink" title="7.10 对象类型的auto变量、__block变量"></a>7.10 对象类型的auto变量、__block变量</h2><ul>
+<li>当block在栈上时，对它们都不会产生强引用</li>
+<li>当block拷贝到堆上时，都会通过copy函数来处理它们</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__block变量（假设变量名叫做a）</span><br><span class="line">_Block_object_assign((void*)&amp;dst-&gt;a, (void*)src-&gt;a, 8/*BLOCK_FIELD_IS_BYREF*/);</span><br><span class="line"></span><br><span class="line">对象类型的auto变量（假设变量名叫做p）</span><br><span class="line">_Block_object_assign((void*)&amp;dst-&gt;p, (void*)src-&gt;p, 3/*BLOCK_FIELD_IS_OBJECT*/);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>当block从堆上移除时，都会通过dispose函数来释放它们</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__block变量（假设变量名叫做a）</span><br><span class="line">_Block_object_dispose((void*)src-&gt;a, 8/*BLOCK_FIELD_IS_BYREF*/);</span><br><span class="line"></span><br><span class="line">对象类型的auto变量（假设变量名叫做p）</span><br><span class="line">_Block_object_dispose((void*)src-&gt;p, 3/*BLOCK_FIELD_IS_OBJECT*/);</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/04/27/OC底层原理/7/7.10_1.png" alt></p>
+<h2 id="7-11-被-block修饰的对象类型"><a href="#7-11-被-block修饰的对象类型" class="headerlink" title="7.11 被__block修饰的对象类型"></a>7.11 被__block修饰的对象类型</h2><ul>
+<li>当__block变量在栈上时，不会对指向的对象产生强引用</li>
+<li>当__block变量被copy到堆时<ul>
+<li>会调用__block变量内部的copy函数</li>
+<li>copy函数内部会调用_Block_object_assign函数</li>
+<li>_Block_object_assign函数会根据所指向对象的修饰符（<strong>strong、</strong>weak、__unsafe_unretained）做出相应的操作，形成强引用（retain）或者弱引用（注意：这里仅限于ARC时会retain，MRC时不会retain）</li>
+</ul>
+</li>
+<li>如果__block变量从堆上移除<ul>
+<li>会调用__block变量内部的dispose函数</li>
+<li>dispose函数内部会调用_Block_object_dispose函数</li>
+<li>_Block_object_dispose函数会自动释放指向的对象（release）</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-12-循环引用问题"><a href="#7-12-循环引用问题" class="headerlink" title="7.12 循环引用问题"></a>7.12 循环引用问题</h2><p><img src="/2019/04/27/OC底层原理/7/7.12_1.png" alt></p>
+<h3 id="7-12-1-解决循环引用问题-ARC"><a href="#7-12-1-解决循环引用问题-ARC" class="headerlink" title="7.12.1 解决循环引用问题 - ARC"></a>7.12.1 解决循环引用问题 - ARC</h3><ul>
+<li>用<strong>weak、</strong>unsafe_unretained解决</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.12.1_1.png" alt></p>
+<ul>
+<li>用__block解决（必须要调用block）</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.12.1_2.png" alt></p>
+<h3 id="7-12-2-解决循环引用问题-MRC"><a href="#7-12-2-解决循环引用问题-MRC" class="headerlink" title="7.12.2 解决循环引用问题 - MRC"></a>7.12.2 解决循环引用问题 - MRC</h3><ul>
+<li>用__unsafe_unretained解决</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.12.2_1.png" alt></p>
+<ul>
+<li>用__block解决</li>
+</ul>
+<p><img src="/2019/04/27/OC底层原理/7/7.12.2_2.png" alt></p>
 
       
     </div>
@@ -801,7 +1007,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、OC对象的本质"><span class="nav-number">1.</span> <span class="nav-text">1、OC对象的本质</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-OC底层实现"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 OC底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-将Objective-C代码转换为C-C-代码"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 将Objective-C代码转换为C\C++代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-NSObject的底层实现"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 NSObject的底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-实时查看内存数据"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 实时查看内存数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-1-ViewMemory"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.4.1 ViewMemory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-2-LLDB指令"><span class="nav-number">1.4.2.</span> <span class="nav-text">1.4.2 LLDB指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-结构体内存分配"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 结构体内存分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-sizeof注意点"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 sizeof注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题"><span class="nav-number">1.7.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、OC对象的分类"><span class="nav-number">2.</span> <span class="nav-text">2、OC对象的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Objective-C中的对象，简称OC对象，主要可以分为3种"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Objective-C中的对象，简称OC对象，主要可以分为3种</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-instance"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-class"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-3-meta-class"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 meta-class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-4-注意"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-5-查看Class是否为meta-class"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5 查看Class是否为meta-class</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-object-getClass内部实现"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 object_getClass内部实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-isa指针"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 isa指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-class对象的superclass指针"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 class对象的superclass指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-meta-class对象的superclass指"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 meta-class对象的superclass指</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-isa、superclass总结"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 isa、superclass总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-class结构体"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 class结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-1-isa指针"><span class="nav-number">2.7.1.</span> <span class="nav-text">2.7.1 isa指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-2-objc4源码下载"><span class="nav-number">2.7.2.</span> <span class="nav-text">2.7.2 objc4源码下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-3-窥探struct-objc-class的结构"><span class="nav-number">2.7.3.</span> <span class="nav-text">2.7.3 窥探struct objc_class的结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-1"><span class="nav-number">2.8.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、KVO"><span class="nav-number">3.</span> <span class="nav-text">3、KVO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-未使用KVO监听的对象"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 未使用KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-使用了KVO监听的对象"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用了KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-查看-NSSet-AndNotify的存在"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 查看_NSSet*AndNotify的存在</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-NSSet-ValueAndNotify的内部实现"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 _NSSet*ValueAndNotify的内部实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-KVO子类的内部方法"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.5 KVO子类的内部方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-2"><span class="nav-number">3.5.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、KVC"><span class="nav-number">4.</span> <span class="nav-text">4、KVC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-概述"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-setValue-forKey-的原理"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 setValue:forKey:的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-valueForKey-的原理"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 valueForKey:的原理</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、OC对象的本质"><span class="nav-number">1.</span> <span class="nav-text">1、OC对象的本质</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-OC底层实现"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 OC底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-将Objective-C代码转换为C-C-代码"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 将Objective-C代码转换为C\C++代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-NSObject的底层实现"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 NSObject的底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-实时查看内存数据"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 实时查看内存数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-1-ViewMemory"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.4.1 ViewMemory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-2-LLDB指令"><span class="nav-number">1.4.2.</span> <span class="nav-text">1.4.2 LLDB指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-结构体内存分配"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 结构体内存分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-sizeof注意点"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 sizeof注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题"><span class="nav-number">1.7.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、OC对象的分类"><span class="nav-number">2.</span> <span class="nav-text">2、OC对象的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Objective-C中的对象，简称OC对象，主要可以分为3种"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Objective-C中的对象，简称OC对象，主要可以分为3种</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-instance"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-class"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-3-meta-class"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 meta-class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-4-注意"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-5-查看Class是否为meta-class"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5 查看Class是否为meta-class</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-object-getClass内部实现"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 object_getClass内部实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-isa指针"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 isa指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-class对象的superclass指针"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 class对象的superclass指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-meta-class对象的superclass指"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 meta-class对象的superclass指</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-isa、superclass总结"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 isa、superclass总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-class结构体"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 class结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-1-isa指针"><span class="nav-number">2.7.1.</span> <span class="nav-text">2.7.1 isa指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-2-objc4源码下载"><span class="nav-number">2.7.2.</span> <span class="nav-text">2.7.2 objc4源码下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-3-窥探struct-objc-class的结构"><span class="nav-number">2.7.3.</span> <span class="nav-text">2.7.3 窥探struct objc_class的结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-1"><span class="nav-number">2.8.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、KVO"><span class="nav-number">3.</span> <span class="nav-text">3、KVO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-未使用KVO监听的对象"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 未使用KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-使用了KVO监听的对象"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用了KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-查看-NSSet-AndNotify的存在"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 查看_NSSet*AndNotify的存在</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-NSSet-ValueAndNotify的内部实现"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 _NSSet*ValueAndNotify的内部实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-KVO子类的内部方法"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.5 KVO子类的内部方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-2"><span class="nav-number">3.5.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、KVC"><span class="nav-number">4.</span> <span class="nav-text">4、KVC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-概述"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-setValue-forKey-的原理"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 setValue:forKey:的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-valueForKey-的原理"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 valueForKey:的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-3"><span class="nav-number">4.4.</span> <span class="nav-text">面试题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过KVC修改属性会触发KVO么？"><span class="nav-number">4.4.1.</span> <span class="nav-text">通过KVC修改属性会触发KVO么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KVC的赋值和取值过程是怎样的？原理是什么？"><span class="nav-number">4.4.2.</span> <span class="nav-text">KVC的赋值和取值过程是怎样的？原理是什么？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5、Category"><span class="nav-number">5.</span> <span class="nav-text">5、Category</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-Category的底层结构"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 Category的底层结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-Category的加载处理过程"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 Category的加载处理过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-load方法"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 +load方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-initialize方法"><span class="nav-number">5.4.</span> <span class="nav-text">5.4 +initialize方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6、关联对象"><span class="nav-number">6.</span> <span class="nav-text">6、关联对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-如何实现给分类“添加成员变量”？"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 如何实现给分类“添加成员变量”？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-key的常见用"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 key的常见用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-objc-AssociationPolicy"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 objc_AssociationPolicy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-关联对象的原理"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 关联对象的原理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7、Block"><span class="nav-number">7.</span> <span class="nav-text">7、Block</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-block的本质"><span class="nav-number">7.1.</span> <span class="nav-text">7.1 block的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-block的变量捕获（capture）"><span class="nav-number">7.2.</span> <span class="nav-text">7.2 block的变量捕获（capture）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-3-block的类型"><span class="nav-number">7.3.</span> <span class="nav-text">7.3 block的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-4-block的copy"><span class="nav-number">7.4.</span> <span class="nav-text">7.4 block的copy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-5-对象类型的auto变量"><span class="nav-number">7.5.</span> <span class="nav-text">7.5 对象类型的auto变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-6-weak问题解决"><span class="nav-number">7.6.</span> <span class="nav-text">7.6 __weak问题解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-7-block修饰符"><span class="nav-number">7.7.</span> <span class="nav-text">7.7 __block修饰符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-8-block的内存管理"><span class="nav-number">7.8.</span> <span class="nav-text">7.8 __block的内存管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-9-block的forwarding指针"><span class="nav-number">7.9.</span> <span class="nav-text">7.9 block的forwarding指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-10-对象类型的auto变量、-block变量"><span class="nav-number">7.10.</span> <span class="nav-text">7.10 对象类型的auto变量、__block变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-11-被-block修饰的对象类型"><span class="nav-number">7.11.</span> <span class="nav-text">7.11 被__block修饰的对象类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-12-循环引用问题"><span class="nav-number">7.12.</span> <span class="nav-text">7.12 循环引用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-12-1-解决循环引用问题-ARC"><span class="nav-number">7.12.1.</span> <span class="nav-text">7.12.1 解决循环引用问题 - ARC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-12-2-解决循环引用问题-MRC"><span class="nav-number">7.12.2.</span> <span class="nav-text">7.12.2 解决循环引用问题 - MRC</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
