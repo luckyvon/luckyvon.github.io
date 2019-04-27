@@ -49,7 +49,16 @@ tags:
 
 ## 显示图片
 
-[Hexo-Next如何在文章摘要展示图片](https://blog.csdn.net/u013162035/article/details/81000559)
+1. 设置站点配置hexo项目/_config.yml中post_asset_folder: true（自动创建和文章同名的文件夹）
+
+2. 安装插件
+
+>npm install hexo-asset-image --save
+
+3. 在xxxx.md中想引入图片时，先把图片复制到xxxx这个文件夹中，然后只需要在xxxx.md中按照markdown的格式引入图片
+
+>! [ 这里输入图片描述] ( xxxx/图片名.jpg )
+
 
 ## 首页文章折叠
 
