@@ -105,7 +105,7 @@
 <meta property="og:description" content="前言温故而知新，可以为师矣。有一个地方能够记录平时的心得体会，总结所看所想。当遗忘的时候回头看看，能够快速回忆起来，节约时间。人的精力应该用来进行创造性的活动，而不是死记硬背。有这么多现成的网站，为什么非要自己弄？自己一手带大的才有感情，才能坚持…让我们开始吧。 经过网上查找，github pages + hexo 能够做出功能很强大的网站。使用方便，页面可以高度自定">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2019/04/26/github-hexo-打造个人网站/hexo_header.jpg">
-<meta property="og:updated_time" content="2019-04-27T07:32:35.543Z">
+<meta property="og:updated_time" content="2019-04-27T07:51:59.884Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="github + hexo 打造个人网站">
 <meta name="twitter:description" content="前言温故而知新，可以为师矣。有一个地方能够记录平时的心得体会，总结所看所想。当遗忘的时候回头看看，能够快速回忆起来，节约时间。人的精力应该用来进行创造性的活动，而不是死记硬背。有这么多现成的网站，为什么非要自己弄？自己一手带大的才有感情，才能坚持…让我们开始吧。 经过网上查找，github pages + hexo 能够做出功能很强大的网站。使用方便，页面可以高度自定">
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-27 15:32:35" itemprop="dateModified" datetime="2019-04-27T15:32:35+08:00">2019-04-27</time>
+                <time title="修改时间：2019-04-27 15:51:59" itemprop="dateModified" datetime="2019-04-27T15:51:59+08:00">2019-04-27</time>
               
             
           </span>
@@ -464,7 +464,21 @@
 <h1 id="搭建过程"><a href="#搭建过程" class="headerlink" title="搭建过程"></a>搭建过程</h1><p>因为已经弄完了，就不一一截图了，附上一篇前人总结的文档<br><a href="https://www.jianshu.com/p/cbf8ba8af532" target="_blank" rel="noopener">mac+github+hexo搭建网站</a></p>
 <h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><h2 id="多台电脑同时编辑"><a href="#多台电脑同时编辑" class="headerlink" title="多台电脑同时编辑"></a>多台电脑同时编辑</h2><p><a href="https://www.jianshu.com/p/0b1fccce74e0" target="_blank" rel="noopener">多台电脑上提交和更新Hexo</a>  </p>
 <p>和这位博主不同，我的切分下载到本地之后，将文件全都删掉，只留.git文件（不然没法git同步。。。）然后用hexo init hexo 在分支文件夹内新建一个hexo文件夹，然后将next主题下载到themes文件夹中。需要将next文件夹中的.git删除（属于不同的仓库，不删除的话，无法用git add .添加）。然后将所有文件提交。新建hexo，会带一个gitignore忽略配置文件。将node_modules文件夹忽略了，在别的电脑下载下来这个分支之后，需要cd 到 hexo并运行npm install安装node_modules</p>
-<h2 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h2><p><a href="https://blog.csdn.net/u013162035/article/details/81000559" target="_blank" rel="noopener">Hexo-Next如何在文章摘要展示图片</a></p>
+<h2 id="显示图片"><a href="#显示图片" class="headerlink" title="显示图片"></a>显示图片</h2><ol>
+<li><p>设置站点配置hexo项目/_config.yml中post_asset_folder: true（自动创建和文章同名的文件夹）</p>
+</li>
+<li><p>安装插件</p>
+</li>
+</ol>
+<blockquote>
+<p>npm install hexo-asset-image –save</p>
+</blockquote>
+<ol start="3">
+<li>在xxxx.md中想引入图片时，先把图片复制到xxxx这个文件夹中，然后只需要在xxxx.md中按照markdown的格式引入图片</li>
+</ol>
+<blockquote>
+<p>! [ 这里输入图片描述] ( xxxx/图片名.jpg )</p>
+</blockquote>
 <h2 id="首页文章折叠"><a href="#首页文章折叠" class="headerlink" title="首页文章折叠"></a>首页文章折叠</h2><ol>
 <li>进入hexo博客项目的themes/next目录</li>
 <li>打开_config.yml文件</li>
