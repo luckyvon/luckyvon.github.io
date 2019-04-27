@@ -49,4 +49,4 @@ tags:
 
 ## 显示图片
 
-[Hexo-Next如何在文章摘要展示图片](https://faithlove.github.io/2018/07/18/Hexo-Next如何在文章摘要展示图片/)
+[Hexo-Next如何在文章摘要展示图片](https://blog.csdn.net/u013162035/article/details/81000559)
