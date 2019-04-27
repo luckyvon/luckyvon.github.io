@@ -313,7 +313,7 @@ excerpt_description: true
 # Use <!-- more --> in the post to control excerpt accurately.
 auto_excerpt:
   enable: true
-  length: 150
+  length: 200
 
 # Read more button
 # If true, the read more button would be displayed in excerpt section.
@@ -825,7 +825,7 @@ firestore:
 # Show Views / Visitors of the website / page with busuanzi.
 # Get more information on http://ibruce.info/2015/04/04/busuanzi
 busuanzi_count:
-  enable: false
+  enable: ture
   total_visitors: true
   total_visitors_icon: user
   total_views: true

@@ -74,3 +74,16 @@ auto_excerpt:
   length: 150
 ```
 4. 把enable改为对应的false改为true。通过修改length值，可以自定义折叠的高度。然后hexo d -g，再进主页，问题就解决了！
+
+## 添加阅读次数，访问量
+
+使用hexo next主题集成的[不蒜子统计](http://theme-next.iissnan.com/third-party-services.html#analytics-busuanzi)
+
+1. 进入hexo博客项目的themes/next目录。
+2. 打开_config.yml文件。
+3. 搜索"busuanzi_count",找到如下部分，将enable改为true
+
+```
+busuanzi_count:
+  enable: ture
+```
