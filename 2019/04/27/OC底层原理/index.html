@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1、OC对象的本质1.1 OC底层实现我们平时编写的Objective-C代码，底层实现其实都是C\C++代码。Objective-C的对象、类主要是基于C\C++的结构体实现。  1.2 将Objective-C代码转换为C\C++代码 xcrun  -sdk  iphoneos  clang  -arch  arm64  -rewrite-objc  OC源文件  -o  输出的CPP文件。如">
+<meta name="keywords" content="iOS,OC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OC底层原理">
+<meta property="og:url" content="http://yoursite.com/2019/04/27/OC底层原理/index.html">
+<meta property="og:site_name" content="点滴">
+<meta property="og:description" content="1、OC对象的本质1.1 OC底层实现我们平时编写的Objective-C代码，底层实现其实都是C\C++代码。Objective-C的对象、类主要是基于C\C++的结构体实现。  1.2 将Objective-C代码转换为C\C++代码 xcrun  -sdk  iphoneos  clang  -arch  arm64  -rewrite-objc  OC源文件  -o  输出的CPP文件。如">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.3_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.3_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.3_3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.3_4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.4_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.1_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.1_3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.1_4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.1_5.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.3_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.4_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.5_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.6_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.7_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.7_2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/2/2.7_3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.0_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.1_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.2_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.3_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/3/3.4_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/4/4.2_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/OC底层原理/4/4.3_1.png">
+<meta property="og:updated_time" content="2019-04-27T12:23:28.862Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OC底层原理">
+<meta name="twitter:description" content="1、OC对象的本质1.1 OC底层实现我们平时编写的Objective-C代码，底层实现其实都是C\C++代码。Objective-C的对象、类主要是基于C\C++的结构体实现。  1.2 将Objective-C代码转换为C\C++代码 xcrun  -sdk  iphoneos  clang  -arch  arm64  -rewrite-objc  OC源文件  -o  输出的CPP文件。如">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/27/OC底层原理/1/1.1_1.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/04/27/OC底层原理/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OC底层原理 | 点滴</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">点滴</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">记录每一天</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/27/OC底层原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Luckyvon">
+      <meta itemprop="description" content="不积跬步,无以至千里;不积小流,无以成江海。">
+      <meta itemprop="image" content="/images/header.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OC底层原理
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-27 20:15:09" itemprop="dateCreated datePublished" datetime="2019-04-27T20:15:09+08:00">2019-04-27</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/OC/" itemprop="url" rel="index"><span itemprop="name">OC</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">11k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">10 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1、OC对象的本质"><a href="#1、OC对象的本质" class="headerlink" title="1、OC对象的本质"></a>1、OC对象的本质</h1><h2 id="1-1-OC底层实现"><a href="#1-1-OC底层实现" class="headerlink" title="1.1 OC底层实现"></a>1.1 OC底层实现</h2><p>我们平时编写的Objective-C代码，底层实现其实都是C\C++代码。Objective-C的对象、类主要是基于C\C++的结构体实现。</p>
+<p><img src="/2019/04/27/OC底层原理/1/1.1_1.png" alt></p>
+<h2 id="1-2-将Objective-C代码转换为C-C-代码"><a href="#1-2-将Objective-C代码转换为C-C-代码" class="headerlink" title="1.2 将Objective-C代码转换为C\C++代码"></a>1.2 将Objective-C代码转换为C\C++代码</h2><blockquote>
+<p>xcrun  -sdk  iphoneos  clang  -arch  arm64  -rewrite-objc  OC源文件  -o  输出的CPP文件。<br>如果需要链接其他框架，使用-framework参数。比如-framework UIKit</p>
+</blockquote>
+<h2 id="1-3-NSObject的底层实现"><a href="#1-3-NSObject的底层实现" class="headerlink" title="1.3 NSObject的底层实现"></a>1.3 NSObject的底层实现</h2><p><img src="/2019/04/27/OC底层原理/1/1.3_1.png" alt><br><img src="/2019/04/27/OC底层原理/1/1.3_2.png" alt><br><img src="/2019/04/27/OC底层原理/1/1.3_3.png" alt><br><img src="/2019/04/27/OC底层原理/1/1.3_4.png" alt></p>
+<h2 id="1-4-实时查看内存数据"><a href="#1-4-实时查看内存数据" class="headerlink" title="1.4 实时查看内存数据"></a>1.4 实时查看内存数据</h2><h3 id="1-4-1-ViewMemory"><a href="#1-4-1-ViewMemory" class="headerlink" title="1.4.1 ViewMemory"></a>1.4.1 ViewMemory</h3><p><img src="/2019/04/27/OC底层原理/1/1.4_1.png" alt></p>
+<h3 id="1-4-2-LLDB指令"><a href="#1-4-2-LLDB指令" class="headerlink" title="1.4.2 LLDB指令"></a>1.4.2 LLDB指令</h3><blockquote>
+<p>print、p：打印<br>po：打印对象</p>
+<p>读取内存<br>memory read/数量格式字节数  内存地址<br>x/数量格式字节数  内存地址<br>x/3xw  0x10010</p>
+<p>格式<br>x是16进制<br>f是浮点<br>d是10进制</p>
+<p>字节大小<br>b：byte 1字节<br>h：half word 2字节<br>w：word 4字节<br>g：giant word 8字节</p>
+<p>修改内存中的值<br>memory  write  内存地址  数值<br>memory  write  0x0000010  10</p>
+</blockquote>
+<h2 id="1-5-结构体内存分配"><a href="#1-5-结构体内存分配" class="headerlink" title="1.5 结构体内存分配"></a>1.5 结构体内存分配</h2><p><a href="http://www.cnblogs.com/xieyajie/p/8094788.html" target="_blank" rel="noopener">结构体大小计算</a></p>
+<h2 id="1-6-sizeof注意点"><a href="#1-6-sizeof注意点" class="headerlink" title="1.6 sizeof注意点"></a>1.6 sizeof注意点</h2><p>sizeof是编译器特性，在编译的时候直接进行常理替换，并不是函数。class_getInstanceSize需要在运行时确定大小。</p>
+<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><ul>
+<li>1.1一个NSObject对象占用多少内存？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"> NSObject *obj = [[NSObject alloc] init];</span><br><span class="line">// 16个字节</span><br><span class="line">    </span><br><span class="line">// 获得NSObject实例对象的成员变量所占用的大小 =8</span><br><span class="line">NSLog(@&quot;%zd&quot;, class_getInstanceSize([NSObject class]));//8</span><br><span class="line">    </span><br><span class="line">// 系统分配了16个字节给NSObject对象</span><br><span class="line">//CF requires all objects be at least 16 bytes</span><br><span class="line">NSLog(@&quot;%zd&quot;, malloc_size((__bridge const void *)obj));//16</span><br><span class="line"></span><br><span class="line">苹果系统分配内存源码</span><br><span class="line">https://opensource.apple.com/tarballs/libmalloc/</span><br><span class="line">malloc.c/calloc  Buckets sized &#123;16,32,64,80,96,112,...&#125;</span><br><span class="line">操作系统分配内存也有对齐，16的整数倍</span><br><span class="line"></span><br><span class="line">创建一个实例对象，至少需要多少内存？//结构体内存对齐</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">class_getInstanceSize([NSObject class]);</span><br><span class="line"></span><br><span class="line">建一个实例对象，实际上分配了多少内存？//操作系统分配内存也会对齐，16的整数倍</span><br><span class="line">#import &lt;malloc/malloc.h&gt;</span><br><span class="line">malloc_size((__bridge const void *)obj);</span><br><span class="line"></span><br><span class="line">sizeof()也能计算出大小</span><br><span class="line"></span><br><span class="line">gnu（glibc/malloc/MALLOC_ALIGNMENT=16 c语言源码）是一个开源组织也提供了相关源码</span><br></pre></td></tr></table></figure>
+<h1 id="2、OC对象的分类"><a href="#2、OC对象的分类" class="headerlink" title="2、OC对象的分类"></a>2、OC对象的分类</h1><h2 id="2-1-Objective-C中的对象，简称OC对象，主要可以分为3种"><a href="#2-1-Objective-C中的对象，简称OC对象，主要可以分为3种" class="headerlink" title="2.1 Objective-C中的对象，简称OC对象，主要可以分为3种"></a>2.1 Objective-C中的对象，简称OC对象，主要可以分为3种</h2><ul>
+<li>instance对象（实例对象）</li>
+<li>class对象（类对象）</li>
+<li>meta-class对象（元类对象） </li>
+</ul>
+<h3 id="2-1-1-instance"><a href="#2-1-1-instance" class="headerlink" title="2.1.1 instance"></a>2.1.1 instance</h3><p><img src="/2019/04/27/OC底层原理/2/2.1_1.png" alt></p>
+<h3 id="2-1-2-class"><a href="#2-1-2-class" class="headerlink" title="2.1.2 class"></a>2.1.2 class</h3><p><img src="/2019/04/27/OC底层原理/2/2.1_2.png" alt></p>
+<h3 id="2-1-3-meta-class"><a href="#2-1-3-meta-class" class="headerlink" title="2.1.3 meta-class"></a>2.1.3 meta-class</h3><p><img src="/2019/04/27/OC底层原理/2/2.1_3.png" alt></p>
+<h3 id="2-1-4-注意"><a href="#2-1-4-注意" class="headerlink" title="2.1.4 注意"></a>2.1.4 注意</h3><p><img src="/2019/04/27/OC底层原理/2/2.1_4.png" alt></p>
+<h3 id="2-1-5-查看Class是否为meta-class"><a href="#2-1-5-查看Class是否为meta-class" class="headerlink" title="2.1.5 查看Class是否为meta-class"></a>2.1.5 查看Class是否为meta-class</h3><p><img src="/2019/04/27/OC底层原理/2/2.1_5.png" alt></p>
+<h2 id="2-2-object-getClass内部实现"><a href="#2-2-object-getClass内部实现" class="headerlink" title="2.2 object_getClass内部实现"></a>2.2 object_getClass内部实现</h2><p><a href="https://opensource.apple.com/tarballs/" target="_blank" rel="noopener">https://opensource.apple.com/tarballs/</a><br>objc4/objc-runtime.mm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> 1.Class objc_getClass(const char *aClassName)</span><br><span class="line"> 1&gt; 传入字符串类名</span><br><span class="line"> 2&gt; 返回对应的类对象</span><br><span class="line"> </span><br><span class="line"> 2.Class object_getClass(id obj)</span><br><span class="line"> 1&gt; 传入的obj可能是instance对象、class对象、meta-class对象</span><br><span class="line"> 2&gt; 返回值</span><br><span class="line"> a) 如果是instance对象，返回class对象</span><br><span class="line"> b) 如果是class对象，返回meta-class对象</span><br><span class="line"> c) 如果是meta-class对象，返回NSObject（基类）的meta-class对象</span><br><span class="line"> </span><br><span class="line"> 3.- (Class)class、+ (Class)class</span><br><span class="line"> 1&gt; 返回的就是类对象</span><br><span class="line"> </span><br><span class="line"> - (Class) &#123;</span><br><span class="line">     return self-&gt;isa;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> + (Class) &#123;</span><br><span class="line">     return self;</span><br><span class="line"> &#125;</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<h2 id="2-3-isa指针"><a href="#2-3-isa指针" class="headerlink" title="2.3 isa指针"></a>2.3 isa指针</h2><p><img src="/2019/04/27/OC底层原理/2/2.3_1.png" alt></p>
+<h2 id="2-4-class对象的superclass指针"><a href="#2-4-class对象的superclass指针" class="headerlink" title="2.4 class对象的superclass指针"></a>2.4 class对象的superclass指针</h2><p><img src="/2019/04/27/OC底层原理/2/2.4_1.png" alt></p>
+<h2 id="2-5-meta-class对象的superclass指"><a href="#2-5-meta-class对象的superclass指" class="headerlink" title="2.5 meta-class对象的superclass指"></a>2.5 meta-class对象的superclass指</h2><p><img src="/2019/04/27/OC底层原理/2/2.5_1.png" alt></p>
+<h2 id="2-6-isa、superclass总结"><a href="#2-6-isa、superclass总结" class="headerlink" title="2.6 isa、superclass总结"></a>2.6 isa、superclass总结</h2><p><img src="/2019/04/27/OC底层原理/2/2.6_1.png" alt></p>
+<h2 id="2-7-class结构体"><a href="#2-7-class结构体" class="headerlink" title="2.7 class结构体"></a>2.7 class结构体</h2><h3 id="2-7-1-isa指针"><a href="#2-7-1-isa指针" class="headerlink" title="2.7.1 isa指针"></a>2.7.1 isa指针</h3><p><img src="/2019/04/27/OC底层原理/2/2.7_1.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">struct mj_objc_class &#123;</span><br><span class="line">    Class isa;</span><br><span class="line">    Class superclass;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">        // MJPerson类对象的地址：0x00000001000014c8</span><br><span class="line">        // isa &amp; ISA_MASK：0x00000001000014c8</span><br><span class="line">        </span><br><span class="line">        // MJPerson实例对象的isa：0x001d8001000014c9</span><br><span class="line">        </span><br><span class="line">        struct mj_objc_class *personClass = (__bridge struct mj_objc_class *)([MJPerson class]);</span><br><span class="line">        </span><br><span class="line">        struct mj_objc_class *studentClass = (__bridge struct mj_objc_class *)([MJStudent class]);</span><br><span class="line">        </span><br><span class="line">        NSLog(@&quot;1111&quot;);</span><br><span class="line">        </span><br><span class="line">//        MJPerson *person = [[MJPerson alloc] init];</span><br><span class="line">//</span><br><span class="line">        </span><br><span class="line">//        Class personClass = [MJPerson class];</span><br><span class="line">        </span><br><span class="line">//        struct mj_objc_class *personClass2 = (__bridge struct mj_objc_class *)(personClass);</span><br><span class="line">//</span><br><span class="line">//        Class personMetaClass = object_getClass(personClass);</span><br><span class="line">//</span><br><span class="line">//        NSLog(@&quot;%p %p %p&quot;, person, personClass, personMetaClass);</span><br><span class="line">//        MJStudent *student = [[MJStudent alloc] init];</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">64bit之前isa = 对象地址，从64bit开始，isa需要进行一次位运算，才能计算出真实地址	</span><br><span class="line">p/x (long)person-&gt;isa</span><br><span class="line">输出</span><br><span class="line">0x001d8001000014c9</span><br><span class="line"></span><br><span class="line">p/x persionClass </span><br><span class="line">输出</span><br><span class="line">0x00000001000014c8</span><br><span class="line"></span><br><span class="line">p/x 0x001d8001000014c9 &amp; 0x00007ffffffffff8（x86下ISA_MASK）</span><br><span class="line">输出</span><br><span class="line">0x00000001000014c8</span><br></pre></td></tr></table></figure>
+<h3 id="2-7-2-objc4源码下载"><a href="#2-7-2-objc4源码下载" class="headerlink" title="2.7.2 objc4源码下载"></a>2.7.2 objc4源码下载</h3><ul>
+<li><a href="https://opensource.apple.com/tarballs/objc4/" target="_blank" rel="noopener">https://opensource.apple.com/tarballs/objc4/</a><br><img src="/2019/04/27/OC底层原理/2/2.7_2.png" alt></li>
+<li>class、meta-class对象的本质结构都是struct objc_class</li>
+</ul>
+<h3 id="2-7-3-窥探struct-objc-class的结构"><a href="#2-7-3-窥探struct-objc-class的结构" class="headerlink" title="2.7.3 窥探struct objc_class的结构"></a>2.7.3 窥探struct objc_class的结构</h3><p><img src="/2019/04/27/OC底层原理/2/2.7_3.png" alt></p>
+<p><a href="./project/objc_class的结构">objc_class的结构项目</a></p>
+<h2 id="面试题-1"><a href="#面试题-1" class="headerlink" title="面试题"></a>面试题</h2><ul>
+<li>对象的isa指针指向哪里？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">instance对象的isa指向class对象</span><br><span class="line">class对象的isa指向meta-class对象</span><br><span class="line">meta-class对象的isa指向基类的meta-class对象</span><br></pre></td></tr></table></figure>
+<ul>
+<li>OC的类信息存放在哪里？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">对象方法、属性、成员变量、协议信息，存放在class对象中</span><br><span class="line">类方法，存放在meta-class对象中</span><br><span class="line">成员变量的具体值，存放在instance对象</span><br></pre></td></tr></table></figure>
+<h1 id="3、KVO"><a href="#3、KVO" class="headerlink" title="3、KVO"></a>3、KVO</h1><blockquote>
+<p>KVO的全称是Key-Value Observing，俗称“键值监听”，可以用于监听某个对象属性值的改变</p>
+</blockquote>
+<p><img src="/2019/04/27/OC底层原理/3/3.0_1.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">@interface ViewController ()</span><br><span class="line">@property (strong, nonatomic) MJPerson *person1;</span><br><span class="line">@property (strong, nonatomic) MJPerson *person2;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ViewController</span><br><span class="line"></span><br><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    self.person1 = [[MJPerson alloc] init];</span><br><span class="line">    self.person1.age = 1;</span><br><span class="line">    self.person1.height = 11;</span><br><span class="line">    </span><br><span class="line">    self.person2 = [[MJPerson alloc] init];</span><br><span class="line">    self.person2.age = 2;</span><br><span class="line">    self.person2.height = 22;</span><br><span class="line">    </span><br><span class="line">    // 给person1对象添加KVO监听</span><br><span class="line">    NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;</span><br><span class="line">    [self.person1 addObserver:self forKeyPath:@&quot;age&quot; options:options context:@&quot;123&quot;];</span><br><span class="line">    [self.person1 addObserver:self forKeyPath:@&quot;height&quot; options:options context:@&quot;456&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event</span><br><span class="line">&#123;</span><br><span class="line">    self.person1.age = 20;</span><br><span class="line">    self.person2.age = 20;</span><br><span class="line">    </span><br><span class="line">    self.person1.height = 30;</span><br><span class="line">    self.person2.height = 30;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)dealloc &#123;</span><br><span class="line">    [self.person1 removeObserver:self forKeyPath:@&quot;age&quot;];</span><br><span class="line">    [self.person1 removeObserver:self forKeyPath:@&quot;height&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当监听对象的属性值发生改变时，就会调用</span><br><span class="line">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;监听到%@的%@属性值改变了 - %@ - %@&quot;, object, keyPath, change, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="./project/3.0_1">KVODemo</a></p>
+<h2 id="3-1-未使用KVO监听的对象"><a href="#3-1-未使用KVO监听的对象" class="headerlink" title="3.1 未使用KVO监听的对象"></a>3.1 未使用KVO监听的对象</h2><p><img src="/2019/04/27/OC底层原理/3/3.1_1.png" alt></p>
+<h2 id="3-2-使用了KVO监听的对象"><a href="#3-2-使用了KVO监听的对象" class="headerlink" title="3.2 使用了KVO监听的对象"></a>3.2 使用了KVO监听的对象</h2><p><img src="/2019/04/27/OC底层原理/3/3.2_1.png" alt></p>
+<h2 id="3-3-查看-NSSet-AndNotify的存在"><a href="#3-3-查看-NSSet-AndNotify的存在" class="headerlink" title="3.3 查看_NSSet*AndNotify的存在"></a>3.3 查看_NSSet*AndNotify的存在</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line">@interface MJPerson : NSObject</span><br><span class="line">@property (assign, nonatomic) int age;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation MJPerson</span><br><span class="line"></span><br><span class="line">- (void)setAge:(int)age</span><br><span class="line">&#123;</span><br><span class="line">    _age = age;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;setAge:&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//- (int)age</span><br><span class="line">//&#123;</span><br><span class="line">//    return _age;</span><br><span class="line">//&#125;</span><br><span class="line"></span><br><span class="line">- (void)willChangeValueForKey:(NSString *)key</span><br><span class="line">&#123;</span><br><span class="line">    [super willChangeValueForKey:key];</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;willChangeValueForKey&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)didChangeValueForKey:(NSString *)key</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;didChangeValueForKey - begin&quot;);</span><br><span class="line">    </span><br><span class="line">    [super didChangeValueForKey:key];</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;didChangeValueForKey - end&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//ViewController</span><br><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    self.person1 = [[MJPerson alloc] init];</span><br><span class="line">    self.person1.age = 1;</span><br><span class="line">    </span><br><span class="line">    self.person2 = [[MJPerson alloc] init];</span><br><span class="line">    self.person2.age = 2;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">//    NSLog(@&quot;person1添加KVO监听之前1 - %@ %@&quot;,</span><br><span class="line">//          object_getClass(self.person1),</span><br><span class="line">//          object_getClass(self.person2));</span><br><span class="line"></span><br><span class="line">//    NSLog(@&quot;person1添加KVO监听之前2 - %p %p&quot;,</span><br><span class="line">//          [self.person1 methodForSelector:@selector(setAge:)],</span><br><span class="line">//          [self.person2 methodForSelector:@selector(setAge:)]);</span><br><span class="line">    </span><br><span class="line">    // 给person1对象添加KVO监听</span><br><span class="line">    NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;</span><br><span class="line">    [self.person1 addObserver:self forKeyPath:@&quot;age&quot; options:options context:@&quot;123&quot;];</span><br><span class="line">    </span><br><span class="line">//    NSLog(@&quot;person1添加KVO监听之后1 - %@ %@&quot;,</span><br><span class="line">//          object_getClass(self.person1),</span><br><span class="line">//          object_getClass(self.person2));</span><br><span class="line">//    NSLog(@&quot;person1添加KVO监听之后2 - %p %p&quot;,</span><br><span class="line">//          [self.person1 methodForSelector:@selector(setAge:)],</span><br><span class="line">//          [self.person2 methodForSelector:@selector(setAge:)]);</span><br><span class="line">//</span><br><span class="line">//</span><br><span class="line">//    NSLog(@&quot;类对象 - %@ %@&quot;,</span><br><span class="line">//          object_getClass(self.person1),  // self.person1.isa</span><br><span class="line">//          object_getClass(self.person2)); // self.person2.isa</span><br><span class="line">//    NSLog(@&quot;类对象 - %p %p&quot;,</span><br><span class="line">//          object_getClass(self.person1),  // self.person1.isa</span><br><span class="line">//          object_getClass(self.person2)); // self.person2.isa</span><br><span class="line">//</span><br><span class="line">//    NSLog(@&quot;元类对象 - %@ %@&quot;,</span><br><span class="line">//          object_getClass(object_getClass(self.person1)), // self.person1.isa.isa</span><br><span class="line">//          object_getClass(object_getClass(self.person2))); // self.person2.isa.isa</span><br><span class="line">//    NSLog(@&quot;元类对象 - %p %p&quot;,</span><br><span class="line">//          object_getClass(object_getClass(self.person1)), // self.person1.isa.isa</span><br><span class="line">//          object_getClass(object_getClass(self.person2))); // self.person2.isa.isa</span><br><span class="line"></span><br><span class="line">//Log查看方法</span><br><span class="line">persion1添加KVO监听之前2 - 0x1065687c0 0x1065687c0</span><br><span class="line">persion1添加KVO监听之后2 - 0x1069189e4 0x1065687c0</span><br><span class="line"></span><br><span class="line">p (IMP)0x1065687c0</span><br><span class="line">(IMP) $0 0x00... (Interview01`-[MJPerson setAge:] at MJPerson.m13)</span><br><span class="line"></span><br><span class="line">p (IMP)0x1069189e4</span><br><span class="line">(IMP) $1 0x00... (Foundation`_NSSetIntValueAndNotify)</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">类对象 - NSKVONotifying_MJPerson MJPersion</span><br><span class="line">元类对象 - NSKVONotifying_MJPerson MJPersion</span><br><span class="line"></span><br><span class="line">- (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event</span><br><span class="line">&#123;</span><br><span class="line">    // NSKVONotifying_MJPerson是使用Runtime动态创建的一个类，是MJPerson的子类</span><br><span class="line">    // self.person1.isa == NSKVONotifying_MJPerson</span><br><span class="line">    [self.person1 setAge:21];</span><br><span class="line">    </span><br><span class="line">    // self.person2.isa = MJPerson</span><br><span class="line">//    [self.person2 setAge:22];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)dealloc &#123;</span><br><span class="line">    [self.person1 removeObserver:self forKeyPath:@&quot;age&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当监听对象的属性值发生改变时，就会调用</span><br><span class="line">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;监听到%@的%@属性值改变了 - %@ - %@&quot;, object, keyPath, change, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/04/27/OC底层原理/3/3.3_1.png" alt></p>
+<h2 id="3-4-NSSet-ValueAndNotify的内部实现"><a href="#3-4-NSSet-ValueAndNotify的内部实现" class="headerlink" title="3.4 _NSSet*ValueAndNotify的内部实现"></a>3.4 _NSSet*ValueAndNotify的内部实现</h2><p><img src="/2019/04/27/OC底层原理/3/3.4_1.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">调用willChangeValueForKey:</span><br><span class="line">调用原来的setter实现</span><br><span class="line">调用didChangeValueForKey:</span><br><span class="line">didChangeValueForKey:内部会调用observer的observeValueForKeyPath:ofObject:change:context:方法</span><br></pre></td></tr></table></figure>
+<h3 id="3-5-KVO子类的内部方法"><a href="#3-5-KVO子类的内部方法" class="headerlink" title="3.5 KVO子类的内部方法"></a>3.5 KVO子类的内部方法</h3> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"> 通过runtime获取方法类表。就知道有下面方法</span><br><span class="line"> - (void)printMethodNamesOfClass:(Class)cls &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    // 获得方法数组</span><br><span class="line">    Method *methodList = class_copyMethodList(cls, &amp;count);</span><br><span class="line">    </span><br><span class="line">    // 存储方法名</span><br><span class="line">    NSMutableString *methodNames = [NSMutableString string];</span><br><span class="line">    </span><br><span class="line">    // 遍历所有的方法</span><br><span class="line">    for (int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        // 获得方法</span><br><span class="line">        Method method = methodList[i];</span><br><span class="line">        // 获得方法名</span><br><span class="line">        NSString *methodName = NSStringFromSelector(method_getName(method));</span><br><span class="line">        // 拼接方法名</span><br><span class="line">        [methodNames appendString:methodName];</span><br><span class="line">        [methodNames appendString:@&quot;, &quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 释放</span><br><span class="line">    free(methodList);</span><br><span class="line">    </span><br><span class="line">    // 打印方法名</span><br><span class="line">    NSLog(@&quot;%@ %@&quot;, cls, methodNames);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> @implementation NSKVONotifying_MJPerson</span><br><span class="line"></span><br><span class="line">- (void)setAge:(int)age</span><br><span class="line">&#123;</span><br><span class="line">    _NSSetIntValueAndNotify();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 屏幕内部实现，隐藏了NSKVONotifying_MJPerson类的存在</span><br><span class="line">- (Class)class</span><br><span class="line">&#123;</span><br><span class="line">    return [MJPerson class];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)dealloc</span><br><span class="line">&#123;</span><br><span class="line">    // 收尾工作</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (BOOL)_isKVOA</span><br><span class="line">&#123;</span><br><span class="line">    return YES;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h2 id="面试题-2"><a href="#面试题-2" class="headerlink" title="面试题"></a>面试题</h2><ul>
+<li>iOS用什么方式实现对一个对象的KVO？(KVO的本质是什么？)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">利用RuntimeAPI动态生成一个子类，并且让instance对象的isa指向这个全新的子类</span><br><span class="line">当修改instance对象的属性时，会调用Foundation的_NSSetXXXValueAndNotify函数</span><br><span class="line">willChangeValueForKey:</span><br><span class="line">父类原来的setter</span><br><span class="line">didChangeValueForKey:</span><br><span class="line">内部会触发监听器（Oberser）的监听方法( observeValueForKeyPath:ofObject:change:context:）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如何手动触发KVO？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">手动调用willChangeValueForKey:和didChangeValueForKey:</span><br></pre></td></tr></table></figure>
+<ul>
+<li>直接修改成员变量会触发KVO么？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不会触发KVO</span><br></pre></td></tr></table></figure>
+<h1 id="4、KVC"><a href="#4、KVC" class="headerlink" title="4、KVC"></a>4、KVC</h1><h2 id="4-1-概述"><a href="#4-1-概述" class="headerlink" title="4.1 概述"></a>4.1 概述</h2><blockquote>
+<p>KVC的全称是Key-Value Coding，俗称“键值编码”，可以通过一个key来访问某个属性</p>
+</blockquote>
+<p>常见的API有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (void)setValue:(id)value forKeyPath:(NSString *)keyPath;</span><br><span class="line">- (void)setValue:(id)value forKey:(NSString *)key;</span><br><span class="line">- (id)valueForKeyPath:(NSString *)keyPath;</span><br><span class="line">- (id)valueForKey:(NSString *)key;</span><br></pre></td></tr></table></figure>
+<h2 id="4-2-setValue-forKey-的原理"><a href="#4-2-setValue-forKey-的原理" class="headerlink" title="4.2 setValue:forKey:的原理"></a>4.2 setValue:forKey:的原理</h2><p><img src="/2019/04/27/OC底层原理/4/4.2_1.png" alt></p>
+<ul>
+<li>accessInstanceVariablesDirectly方法的默认返回值是YES</li>
+</ul>
+<h2 id="4-3-valueForKey-的原理"><a href="#4-3-valueForKey-的原理" class="headerlink" title="4.3 valueForKey:的原理"></a>4.3 valueForKey:的原理</h2><p><img src="/2019/04/27/OC底层原理/4/4.3_1.png" alt></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/OC/" rel="tag"># OC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/26/github-hexo-打造个人网站/" rel="next" title="github + hexo 打造个人网站">
+                <i class="fa fa-chevron-left"></i> github + hexo 打造个人网站
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.gif" alt="Luckyvon">
+            
+              <p class="site-author-name" itemprop="name">Luckyvon</p>
+              <div class="site-description motion-element" itemprop="description">不积跬步,无以至千里;不积小流,无以成江海。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/luckyvon" title="GitHub &rarr; https://github.com/luckyvon" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、OC对象的本质"><span class="nav-number">1.</span> <span class="nav-text">1、OC对象的本质</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-OC底层实现"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 OC底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-将Objective-C代码转换为C-C-代码"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 将Objective-C代码转换为C\C++代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-NSObject的底层实现"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 NSObject的底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-实时查看内存数据"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 实时查看内存数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-1-ViewMemory"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.4.1 ViewMemory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-2-LLDB指令"><span class="nav-number">1.4.2.</span> <span class="nav-text">1.4.2 LLDB指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-结构体内存分配"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 结构体内存分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-sizeof注意点"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 sizeof注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题"><span class="nav-number">1.7.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、OC对象的分类"><span class="nav-number">2.</span> <span class="nav-text">2、OC对象的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Objective-C中的对象，简称OC对象，主要可以分为3种"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Objective-C中的对象，简称OC对象，主要可以分为3种</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-instance"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-class"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-3-meta-class"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 meta-class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-4-注意"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-5-查看Class是否为meta-class"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5 查看Class是否为meta-class</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-object-getClass内部实现"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 object_getClass内部实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-isa指针"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 isa指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-class对象的superclass指针"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 class对象的superclass指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-meta-class对象的superclass指"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 meta-class对象的superclass指</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-isa、superclass总结"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 isa、superclass总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-class结构体"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 class结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-1-isa指针"><span class="nav-number">2.7.1.</span> <span class="nav-text">2.7.1 isa指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-2-objc4源码下载"><span class="nav-number">2.7.2.</span> <span class="nav-text">2.7.2 objc4源码下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-3-窥探struct-objc-class的结构"><span class="nav-number">2.7.3.</span> <span class="nav-text">2.7.3 窥探struct objc_class的结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-1"><span class="nav-number">2.8.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、KVO"><span class="nav-number">3.</span> <span class="nav-text">3、KVO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-未使用KVO监听的对象"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 未使用KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-使用了KVO监听的对象"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用了KVO监听的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-查看-NSSet-AndNotify的存在"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 查看_NSSet*AndNotify的存在</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-NSSet-ValueAndNotify的内部实现"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 _NSSet*ValueAndNotify的内部实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-KVO子类的内部方法"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.5 KVO子类的内部方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题-2"><span class="nav-number">3.5.</span> <span class="nav-text">面试题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、KVC"><span class="nav-number">4.</span> <span class="nav-text">4、KVC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-概述"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-setValue-forKey-的原理"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 setValue:forKey:的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-valueForKey-的原理"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 valueForKey:的原理</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Luckyvon</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
