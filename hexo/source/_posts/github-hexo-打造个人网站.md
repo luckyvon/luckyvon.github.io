@@ -50,3 +50,18 @@ tags:
 ## 显示图片
 
 [Hexo-Next如何在文章摘要展示图片](https://blog.csdn.net/u013162035/article/details/81000559)
+
+## 首页文章折叠
+
+1. 进入hexo博客项目的themes/next目录
+2. 打开_config.yml文件
+3. 搜索"auto_excerpt",找到如下部分
+
+```
+# Automatically Excerpt (Not recommend).
+# Use <!-- more --> in the post to control excerpt accurately.
+auto_excerpt:
+  enable: false
+  length: 150
+```
+4. 把enable改为对应的false改为true。通过修改length值，可以自定义折叠的高度。然后hexo d -g，再进主页，问题就解决了！
