@@ -87,3 +87,46 @@ auto_excerpt:
 busuanzi_count:
   enable: ture
 ```
+
+## 文章字数统计
+
+1. 安装字数统计插件：
+
+>npm install hexo-symbols-count-time --save
+
+2. hexo项目根目录下的_config.yaml,增加如下配置：
+
+```
+symbols_count_time:
+  symbols: true # 文章字数
+  time: true # 阅读时长
+  total_symbols: true # 所有文章总字数
+  total_time: true # 所有文章阅读中时长
+```
+
+3. next主题配置,在themes/next/_config.yaml，修改如下配置：
+
+```
+symbols_count_time:
+  separated_meta: true  # 是否换行显示 字数统计 及 阅读时长
+  item_text_post: true  # 文章 字数统计 阅读时长 使用图标 还是 文本表示
+  item_text_total: false # 博客底部统计 字数统计 阅读时长 使用图标 还是 文本表示
+  awl: 4
+  wpm: 275
+```
+
+## 搜索服务
+
+1. 安装local search插件：
+
+>npm install hexo-generator-searchdb --save
+
+2. 编辑站点配置文件，新增以下内容：
+
+```
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+```

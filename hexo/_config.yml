@@ -81,3 +81,7 @@ deploy:
   type: git 
   repo: https://github.com/luckyvon/luckyvon.github.io.git
   branch: master
+
+symbols_count_time:
+  symbols: true # 文章字数
+  time: true # 阅读时长
