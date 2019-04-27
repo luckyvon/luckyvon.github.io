@@ -105,7 +105,7 @@
 <meta property="og:description" content="前言温故而知新，可以为师矣。有一个地方能够记录平时的心得体会，总结所看所想。当遗忘的时候回头看看，能够快速回忆起来，节约时间。人的精力应该用来进行创造性的活动，而不是死记硬背。有这么多现成的网站，为什么非要自己弄？自己一手带大的才有感情，才能坚持…让我们开始吧。 经过网上查找，github pages + hexo 能够做出功能很强大的网站。使用方便，页面可以高度自定">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2019/04/26/github-hexo-打造个人网站/hexo_header.jpg">
-<meta property="og:updated_time" content="2019-04-27T08:05:41.730Z">
+<meta property="og:updated_time" content="2019-04-27T08:44:20.609Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="github + hexo 打造个人网站">
 <meta name="twitter:description" content="前言温故而知新，可以为师矣。有一个地方能够记录平时的心得体会，总结所看所想。当遗忘的时候回头看看，能够快速回忆起来，节约时间。人的精力应该用来进行创造性的活动，而不是死记硬背。有这么多现成的网站，为什么非要自己弄？自己一手带大的才有感情，才能坚持…让我们开始吧。 经过网上查找，github pages + hexo 能够做出功能很强大的网站。使用方便，页面可以高度自定">
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-27 16:05:41" itemprop="dateModified" datetime="2019-04-27T16:05:41+08:00">2019-04-27</time>
+                <time title="修改时间：2019-04-27 16:44:20" itemprop="dateModified" datetime="2019-04-27T16:44:20+08:00">2019-04-27</time>
               
             
           </span>
@@ -423,6 +423,13 @@
           
           
 
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
           
 
           
@@ -495,7 +502,26 @@
 <li>搜索”busuanzi_count”,找到如下部分，将enable改为true</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">busuanzi_count:</span><br><span class="line">  enable: ture</span><br></pre></td></tr></table></figure>
-
+<h2 id="文章字数统计"><a href="#文章字数统计" class="headerlink" title="文章字数统计"></a>文章字数统计</h2><ol>
+<li>安装字数统计插件：</li>
+</ol>
+<blockquote>
+<p>npm install hexo-symbols-count-time –save</p>
+</blockquote>
+<ol start="2">
+<li>编辑主题配置文件</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">symbols_count_time:</span><br><span class="line">  separated_meta: true     </span><br><span class="line">  item_text_post: true     # 文章字数</span><br><span class="line">  item_text_total: true    # 本站所有文章字数</span><br><span class="line">  awl: 5</span><br><span class="line">  wpm: 200</span><br></pre></td></tr></table></figure>
+<h2 id="搜索服务"><a href="#搜索服务" class="headerlink" title="搜索服务"></a>搜索服务</h2><ol>
+<li>安装local search插件：</li>
+</ol>
+<blockquote>
+<p>npm install hexo-generator-searchdb –save</p>
+</blockquote>
+<ol start="2">
+<li>编辑站点配置文件，新增以下内容：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  limit: 10000</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -510,6 +536,9 @@
     
       
     
+
+    
+
     
 
     
@@ -518,9 +547,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag"># hexo</a>
+            <a href="/tags/hexo/" rel="tag"><i class="fa fa-tag"></i> hexo</a>
           
-            <a href="/tags/github/" rel="tag"># github</a>
+            <a href="/tags/github/" rel="tag"><i class="fa fa-tag"></i> github</a>
           
         </div>
       
@@ -694,7 +723,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关介绍"><span class="nav-number">2.</span> <span class="nav-text">相关介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#搭建过程"><span class="nav-number">3.</span> <span class="nav-text">搭建过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遇到的问题"><span class="nav-number">4.</span> <span class="nav-text">遇到的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#多台电脑同时编辑"><span class="nav-number">4.1.</span> <span class="nav-text">多台电脑同时编辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示图片"><span class="nav-number">4.2.</span> <span class="nav-text">显示图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#首页文章折叠"><span class="nav-number">4.3.</span> <span class="nav-text">首页文章折叠</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加阅读次数，访问量"><span class="nav-number">4.4.</span> <span class="nav-text">添加阅读次数，访问量</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关介绍"><span class="nav-number">2.</span> <span class="nav-text">相关介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#搭建过程"><span class="nav-number">3.</span> <span class="nav-text">搭建过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遇到的问题"><span class="nav-number">4.</span> <span class="nav-text">遇到的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#多台电脑同时编辑"><span class="nav-number">4.1.</span> <span class="nav-text">多台电脑同时编辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示图片"><span class="nav-number">4.2.</span> <span class="nav-text">显示图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#首页文章折叠"><span class="nav-number">4.3.</span> <span class="nav-text">首页文章折叠</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加阅读次数，访问量"><span class="nav-number">4.4.</span> <span class="nav-text">添加阅读次数，访问量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文章字数统计"><span class="nav-number">4.5.</span> <span class="nav-text">文章字数统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索服务"><span class="nav-number">4.6.</span> <span class="nav-text">搜索服务</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -748,6 +777,32 @@
 
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
 
 
 
@@ -789,6 +844,12 @@
 
 
 
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
 
 
 
