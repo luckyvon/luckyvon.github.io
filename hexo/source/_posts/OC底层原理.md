@@ -564,7 +564,9 @@ kvc在setValue:forKey/setValue:forKeyPath中调用willChangeValueForKey、didCha
 1. 通过Runtime加载某个类的所有Category数据
 2. 把所有Category的方法、属性、协议数据，合并到一个大数组中
 后面参与编译的Category数据，会在数组的前面
-3. 将合并后的分类数据（方法、属性、协议），插入到类原来数据的前面
+3. 将合并后的分类数据（方法、属性、协议），插入到类原来数据的前面，多个分类最后面编译的分类添加在类原来数据的最前面。
+
+>注意：通过runtime在运行时将分类的方法合并到类对象和元类对象中。
 
 ```
 源码解读顺序
@@ -580,6 +582,10 @@ attachCategories
 attachLists
 realloc、memmove、 memcpy
 ```
+
+原类添加分类原理图，如果找到方法之后就不会继续往下找了，其他分类和原类中的同名方法还在，但是不会被执行。
+
+![](OC底层原理/5/5.2_1.png)
 
 ## 5.3 +load方法
 
