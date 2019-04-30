@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>1、将错误日志符号化</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <hr>
+<p>title: iOS Crash Log 解析
+date: 2019-04-30 18:20:33
+categories:</p>
+<ul>
+<li>Xcode
+tags:</li>
+<li>Xcode</li>
+</ul>
+<hr>
+<h1 id="1%E5%B0%86%E9%94%99%E8%AF%AF%E6%97%A5%E5%BF%97%E7%AC%A6%E5%8F%B7%E5%8C%96">1、将错误日志符号化</h1>
+<p>我们知道，如果是自己的测试机，在调整的时候发生崩溃，会在Xcode-&gt;Window-&gt;Devices and Simulators-&gt;View Device Logs中产生已经符号化的Crash Log，如果是测试的测试机发生崩溃，将crash log导出在自己电脑上看是没有符号化的，我们需要将crash符号化才能查找出崩溃原因。以下步骤就是将别的测试机中的crash log在自己的测试机中符号化。</p>
+<p>其实之前的organizer之所以能自动解析你设备上的crash log，是因为它能根据spotlight的索引来找到对应的.app和dSYM文件，对于这一点，我的猜测是在自己的Mac电脑上编译生成应用时，系统自动对其进行了索引。这个索引应该是根据app uuid来索引的。这个uuid可以执行下面的命令得到：</p>
+<blockquote>
+<p>dwarfdump —uuid YourApp.app/YourApp
+dwarfdump —uuid YourApp.app.dSYM</p>
+</blockquote>
+<p>如果要能解析出crash log，crash log中携带的uuid与dSYM文件的uuid必须与app uuid一致。
+既然spotlight能自动进行索引，那是不是也可以手动进行索引呢？答案是能，这正是自动解析的关键。手动索引的命令是mdimport</p>
+<p>具体步骤：</p>
+<ol>
+<li>新建一个文件夹（如crash），将crash log对应版本的ipa和dSYM文件放入其中。</li>
+<li>打开crash文件夹所在的目录，执行命令mdimport crash。</li>
+<li>将crash log文件夹拖动到Xcode-&gt;Window-&gt;Devices and Simulators-&gt;View Device Logs-&gt;Devices-&gt;This Device中（xcode需要连接测试机）。</li>
+</ol>
+
+    </body>
+    </html>
