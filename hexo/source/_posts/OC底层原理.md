@@ -581,11 +581,29 @@ remethodizeClass
 attachCategories
 attachLists
 realloc、memmove、 memcpy
+
+注意memmove、 memcpy
+将4567 0、1位置的数据移到1、2位置
+
+memmove流程：
+4567->4557->4457（现将1位置移到2位置，再将0位置移动到1位置，数据在同一块区域。会判断高低位，保证数据完整性）
+用于类中方法的移动。
+
+memcpy流程
+4567->4467->4447（现将0位置移到1位置，再将1位置移动到2位置，将分类中的信息追加到类中由于存放数据在不同的区域可以直接复制。）
+用于将分类中方法的移动到类中。
 ```
 
-原类添加分类原理图，如果找到方法之后就不会继续往下找了，其他分类和原类中的同名方法还在，但是不会被执行。
+原类添加分类原理图
 
 ![](OC底层原理/5/5.2_1.png)
+
+如果找到方法之后就不会继续往下找了，其他分类和原类中的同名方法还在，但是不会被执行。
+* 注意
+1. 原类和分类中有同名的方法，会执行分类中的。
+2. 原类中的同名方法还在，不会被执行。
+3. 一个类的多个分类有同名的方法，会按照编译顺序，执行最后编译的那个分类的方法。(即Build Phases->Compile Sources最下方的分类中的同名方法)
+4. 类扩展（在.m头部写的私有属性，方法）是在编译的时候合并到类中，分类是通过runtime在运行时合并到类中。
 
 ## 5.3 +load方法
 
@@ -594,12 +612,13 @@ realloc、memmove、 memcpy
 * 调用顺序
     1. 先调用类的+load
         1. 按照编译先后顺序调用（先编译，先调用）
-        2. 调用子类的+load之前会先调用父类的+load
+        2. 调用子类的+load之前会先调用父类的+load（如果父类中的load已经调过，只调用一次，不会再调）
     2. 再调用分类的+load
         1. 按照编译先后顺序调用（先编译，先调用）
 
 ```
-objc4源码解读过程：objc-os.mm
+objc4源码解读过程：
+objc-os.mm
 _objc_init
 
 load_images
@@ -613,6 +632,17 @@ call_load_methods
 call_class_loads
 call_category_loads
 (*load_method)(cls, SEL_load)
+
+struct loadable_category {
+    Class cls;
+    IMP method;
+}
+
+struct loadable_category {
+    Class cls;
+    IMP mehtod;
+}
+以上两个结构体中的method就是指向load方法。
 ```
 
 * +load方法是根据方法地址直接调用，并不是经过objc_msgSend函数调用
@@ -636,11 +666,68 @@ lookUpImpOrForward
 _class_initialize
 callInitialize
 objc_msgSend(cls, SEL_initialize)
+
+伪代码
+if (自己没有初始化) {
+    if (父类没有初始化) {
+        objc_msgSend([父类 class], @selector(initialize));
+        父类初始化了;
+    }
+
+    objc_msgSend([自己 class], @selector(initialize));
+    自己初始化了;
+}
+
 ```
 
 * +initialize和+load的很大区别是，+initialize是通过objc_msgSend进行调用的，所以有以下特点:
     * 如果子类没有实现+initialize，会调用父类的+initialize（所以父类的+initialize可能会被调用多次）
     * 如果分类实现了+initialize，就覆盖类本身的+initialize调用
+
+## 面试题
+
+### 1、Category的实现原理
+
+```
+Category编译之后的底层结构是struct category_t，里面存储着分类的对象方法、类方法、属性、协议信息。     
+在程序运行的时候，runtime会将Category的数据，合并到类信息中（类对象、元类对象中）
+```
+
+### 2、Category和Class Extension的区别是什么？
+
+```
+Class Extension在编译的时候，它的数据就已经包含在类信息中
+Category是在运行时，才会将数据合并到类信息中
+```
+
+### 3、Category中有load方法吗？load方法是什么时候调用的？load 方法能继承吗？
+
+```
+有load方法
+load方法在runtime加载类、分类的时候调用
+load方法可以继承，但是一般情况下不会主动去调用load方法，都是让系统自动调用(系统自己调用load方法是直接通过函数地址调用，如果手动调用load，即[Class load]，则通过消息发送机制调用load方法。先根据isa找到元类对象，如果有就调用，没有就通过superclass在父类中查找。)
+```
+
+### 4、load、initialize方法的区别什么？它们在category中的调用的顺序？以及出现继承时他们之间的调用过程？
+
+* load、initialize方法的区别是什么？
+    * 调用方式
+        * load是根据函数地址直接调用
+        * initialize是通过objc_msgSend调用
+    * 调用时机
+        * load是runtime加载类、分类的时候调用（只会调用一次）
+        * initialize是类第一次接收到消息的时候调用（在查找方法列表的时候，看类有没有初始化（先看父类有没有初始化，最后在看自己），没有初始化就发送initialize），每一个类只会调用一次，父类中的initialize方法可能会被调用多次。
+* load、initialize的调用顺序？
+    * load
+        * 先调用类的load
+            * 先编译的类，优先调用load
+            * 调用子类的load之前，会先调用父类的load
+        * 再调用分类的load
+            * 先编译的分类，优先调用load
+    * initialize
+        * 先初始化父类
+        * 再初始化子类（如果子类中没有实现initialize方法，调用父类中的initialize方法）
+
 
 # 6、关联对象
 
@@ -648,19 +735,19 @@ objc_msgSend(cls, SEL_initialize)
 
 默认情况下，因为分类底层结构的限制，不能添加成员变量到分类中。但可以通过关联对象来间接实现
 关联对象提供了以下API:
-1、添加关联对象
+1. 添加关联对象
 
 ```
 void objc_setAssociatedObject(id object, const void * key, id value, objc_AssociationPolicy policy)
 ```
 
-2、获得关联对象
+2. 获得关联对象
 
 ```
 id objc_getAssociatedObject(id object, const void * key
 ```
 
-3、移除所有的关联对象
+3. 移除所有的关联对象
 
 ```
 void objc_removeAssociatedObjects(id object)
@@ -669,26 +756,33 @@ void objc_removeAssociatedObjects(id object)
 ## 6.2 key的常见用
 
 ```
-static void *MyKey = &MyKey;
+static (const) void *MyKey = &MyKey;
 objc_setAssociatedObject(obj, MyKey, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 objc_getAssociatedObject(obj, MyKey)
 
-static char MyKey;
+static (const) char MyKey;
 objc_setAssociatedObject(obj, &MyKey, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 objc_getAssociatedObject(obj, &MyKey)
 
-使用属性名作为key
+使用属性名作为key（同一个常量地址相同）
 objc_setAssociatedObject(obj, @"property", value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 objc_getAssociatedObject(obj, @"property");
 
-使用get方法的@selecor作为key
+使用get方法的@selecor作为key（或者_cmd（和@selector(方法名)等效）
 objc_setAssociatedObject(obj, @selector(getter), value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 objc_getAssociatedObject(obj, @selector(getter))
+
+注意：
+加static是为了让外部无法通过extern访问。static限制作用域。
+加const是为了和函数的参数类型一致，加不加都行。
 ```
 
 ## 6.3 objc_AssociationPolicy
 
 ![](OC底层原理/6/6.3_1.png)
+
+* 注意：没有弱引用（weak）,弱引用相关用assign，如果访问已经释放了的对象，会造成崩溃（对象释放之后，weak会将指针置为nil，assign不会，会出现坏内存访问的崩溃）。
+* 如果关联对象释放了，会将AssociationsHashMap中object对象对应的disguised_ptr_t和ObjectAssociationMap键值对移除。
 
 ## 6.4 关联对象的原理
 
@@ -713,24 +807,108 @@ objc4源码解读：objc-references.mm
 
 ![](OC底层原理/7/7.1_1.png)
 
+```
+^{
+    NSLog(@"this is a block");
+};
+
+执行
+^{
+    NSLog(@"this is a block");
+}();
+
+将block赋值给一个变量
+void (^block)(void) = ^{
+    NSLog(@"this is a block");
+}
+执行
+block();
+
+
+```
+
 ## 7.2 block的变量捕获（capture）
+
+* 变量的分类
+    * 局部变量
+        * auto
+        * static
+        * register
+    * 全局变量
 
 * 为了保证block内部能够正常访问外部的变量，block有个变量捕获机制
 
 ![](OC底层原理/7/7.2_1.png)
 
-* auto变量的捕获
+* 局部变量block会捕获（由于局部变量作用域，可能访问的时候变量已经释放，所以需要在block中保存），全局变量block不会捕获。
+
+* block会捕获self。（self是oc方法的默认参数，是局部变量，oc代码转成c++代码，方法转成函数都会带两个默认参数：Class *self，SEL _cmd）
+
+* 属性、成员变量block会捕获self，需要通过self才能访问到（属性：self.name，成员变量self->_name）
 
 ![](OC底层原理/7/7.2_2.png)
 
+```
+main.m中block的简化执行代码：
+// 定义block变量
+int a = 10;
+static b = 20;
+void (*block)(void) = &__main_block_impl_0(
+                                            __main_block_func_0,
+                                            &__main_block_desc_0_DATA,
+                                            a,
+                                            &b
+                                            );
+
+// 执行block内部的代码
+block->FuncPtr(block);
+
+其中
+//结构体名称__main为调用block的方法名
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  int a;
+  int *b;
+  // 构造函数（类似于OC的init方法），返回结构体对象
+  // a(_a) 将_a的值赋值给a
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc,  int _a, int *_b, int flags=0) : a(_a), b(_b) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+// 封装了block执行逻辑的函数
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+            int a = __cself->a; 
+            int *b = __cself->b;
+            
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_2r__m13fp2x2n9dvlr8d68yry500000gn_T_main_fd2a14_mi_0, a, (*b));
+        }
+
+static struct __main_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+} __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0)};
+```
+
 ## 7.3 block的类型
 block有3种类型，可以通过调用class方法或者isa指针查看具体类型，最终都是继承自NSBlock类型
+
+```
+__NSGlobalBlock__ : __NSGlobalBlock : NSBlock : NSObject(通过[block class],[[block class] superclass],[[[block class] superclass] superclass],[[[[block class] superclass] superclass] superclass]查看)
+
+block的类型以运行时为准，clang转的只能作为参考
+```
 
 * __NSGlobalBlock__ （ _NSConcreteGlobalBlock ）
 * __NSStackBlock__ （ _NSConcreteStackBlock ）
 * __NSMallocBlock__ （ _NSConcreteMallocBlock ）
 
 ![](OC底层原理/7/7.3_1.png)
+越往下内存地址越大
 
 ![](OC底层原理/7/7.3_2.png)
 
