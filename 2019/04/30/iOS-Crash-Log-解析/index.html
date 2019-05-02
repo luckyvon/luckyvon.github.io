@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quic">
-<meta name="keywords" content="iOS">
+  <meta name="description" content="1、将错误日志符号化我们知道，如果是自己的测试机，在调整的时候发生崩溃，会在Xcode-&amp;gt;Window-&amp;gt;Devices and Simulators-&amp;gt;View Device Logs中产生已经符号化的Crash Log，如果是测试的测试机发生崩溃，将crash log导出在自己电脑上看是没有符号化的，我们需要将crash符号化才能查找出崩溃原因。以下步骤就是将别的测试机中的c">
+<meta name="keywords" content="Xcode">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2017/05/26/hello-world/index.html">
+<meta property="og:title" content="iOS Crash Log 解析">
+<meta property="og:url" content="http://yoursite.com/2019/04/30/iOS-Crash-Log-解析/index.html">
 <meta property="og:site_name" content="点滴">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quic">
+<meta property="og:description" content="1、将错误日志符号化我们知道，如果是自己的测试机，在调整的时候发生崩溃，会在Xcode-&amp;gt;Window-&amp;gt;Devices and Simulators-&amp;gt;View Device Logs中产生已经符号化的Crash Log，如果是测试的测试机发生崩溃，将crash log导出在自己电脑上看是没有符号化的，我们需要将crash符号化才能查找出崩溃原因。以下步骤就是将别的测试机中的c">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-04-27T07:35:16.520Z">
+<meta property="og:updated_time" content="2019-05-02T05:21:15.163Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quic">
+<meta name="twitter:title" content="iOS Crash Log 解析">
+<meta name="twitter:description" content="1、将错误日志符号化我们知道，如果是自己的测试机，在调整的时候发生崩溃，会在Xcode-&amp;gt;Window-&amp;gt;Devices and Simulators-&amp;gt;View Device Logs中产生已经符号化的Crash Log，如果是测试的测试机发生崩溃，将crash log导出在自己电脑上看是没有符号化的，我们需要将crash符号化才能查找出崩溃原因。以下步骤就是将别的测试机中的c">
 
 
 
@@ -115,7 +115,7 @@
 
   
   
-  <link rel="canonical" href="http://yoursite.com/2017/05/26/hello-world/">
+  <link rel="canonical" href="http://yoursite.com/2019/04/30/iOS-Crash-Log-解析/">
 
 
 
@@ -125,7 +125,7 @@
   };
 </script>
 
-  <title>Hello World | 点滴</title>
+  <title>iOS Crash Log 解析 | 点滴</title>
   
 
 
@@ -328,7 +328,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/26/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/30/iOS-Crash-Log-解析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Luckyvon">
@@ -345,7 +345,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World
+          <h1 class="post-title" itemprop="name headline">iOS Crash Log 解析
 
               
             
@@ -371,7 +371,7 @@
                 
               
 
-              <time title="创建时间：2017-05-26 12:12:57" itemprop="dateCreated datePublished" datetime="2017-05-26T12:12:57+08:00">2017-05-26</time>
+              <time title="创建时间：2019-04-30 18:20:33" itemprop="dateCreated datePublished" datetime="2019-04-30T18:20:33+08:00">2019-04-30</time>
             
 
             
@@ -389,7 +389,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/test/" itemprop="url" rel="index"><span itemprop="name">test</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Xcode/" itemprop="url" rel="index"><span itemprop="name">Xcode</span></a></span>
 
                 
                 
@@ -425,7 +425,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">431</span>
+                <span title="本文字数">790</span>
               
 
               
@@ -459,16 +459,18 @@
       
 
       
-        <hr>
-<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <h1 id="1、将错误日志符号化"><a href="#1、将错误日志符号化" class="headerlink" title="1、将错误日志符号化"></a>1、将错误日志符号化</h1><p>我们知道，如果是自己的测试机，在调整的时候发生崩溃，会在Xcode-&gt;Window-&gt;Devices and Simulators-&gt;View Device Logs中产生已经符号化的Crash Log，如果是测试的测试机发生崩溃，将crash log导出在自己电脑上看是没有符号化的，我们需要将crash符号化才能查找出崩溃原因。以下步骤就是将别的测试机中的crash log在自己的测试机中符号化。</p>
+<p>其实之前的organizer之所以能自动解析你设备上的crash log，是因为它能根据spotlight的索引来找到对应的.app和dSYM文件，对于这一点，我的猜测是在自己的Mac电脑上编译生成应用时，系统自动对其进行了索引。这个索引应该是根据app uuid来索引的。这个uuid可以执行下面的命令得到：</p>
+<blockquote>
+<p>dwarfdump —uuid YourApp.app/YourApp<br>dwarfdump —uuid YourApp.app.dSYM</p>
+</blockquote>
+<p>如果要能解析出crash log，crash log中携带的uuid与dSYM文件的uuid必须与app uuid一致。<br>既然spotlight能自动进行索引，那是不是也可以手动进行索引呢？答案是能，这正是自动解析的关键。手动索引的命令是mdimport</p>
+<p>具体步骤：</p>
+<ol>
+<li>新建一个文件夹（如crash），将crash log对应版本的ipa和dSYM文件放入其中。</li>
+<li>打开crash文件夹所在的目录，执行命令mdimport crash。</li>
+<li>将crash log文件夹拖动到Xcode-&gt;Window-&gt;Devices and Simulators-&gt;View Device Logs-&gt;Devices-&gt;This Device中（xcode需要连接测试机）。</li>
+</ol>
 
       
     </div>
@@ -502,7 +504,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS/" rel="tag"># iOS</a>
+            <a href="/tags/Xcode/" rel="tag"># Xcode</a>
           
         </div>
       
@@ -515,14 +517,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2019/04/27/OC底层原理/" rel="next" title="OC底层原理">
+                <i class="fa fa-chevron-left"></i> OC底层原理
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/04/26/github-hexo-打造个人网站/" rel="prev" title="github + hexo 打造个人网站">
-                github + hexo 打造个人网站 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/05/02/iOS-Crash-Log-解析/" rel="prev" title>
+                 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -699,7 +705,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、将错误日志符号化"><span class="nav-text">1、将错误日志符号化</span></a></li></ol></div>
             
 
           </div>
