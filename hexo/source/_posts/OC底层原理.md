@@ -908,9 +908,42 @@ block的类型以运行时为准，clang转的只能作为参考
 * __NSMallocBlock__ （ _NSConcreteMallocBlock ）
 
 ![](OC底层原理/7/7.3_1.png)
+
+```
 越往下内存地址越大
 
+int a = 10;
+- (void)test {
+    int b = 20;
+    NSObject *o = [[NSObject allock] init];
+
+    NSLog(@"数据区域：a %p",&a);
+    NSLog(@"栈：b %p",&b);
+    NSLog(@"堆：o %p",o);
+
+    //打印类对象存放地址，看看和哪个区域接近，就可猜测存放位置
+    NSLog(@"未知区域：x %p",[NSObject class]);
+}
+```
+
+
 ![](OC底层原理/7/7.3_2.png)
+
+```
+ARC下block捕获auto变量仍是stackblock，会自动对block进行copy操作，要想观察block类型需要在MRC环境下。
+如果block是StackBlock，离开作用域block会被释放，再访问block会出现未知的错误。
+GlobalBlock、MallocBlock调用copy类型不变，StackBlock调用copy变成MallocBlock。
+MRC下对block进行copy，需要调用release释放block。
+
+- (void)test {
+    int age = 10;
+    void(^block)(void) = [^{
+        NSLog(@"age is %d",age);
+    } copy];
+
+    [block release];
+}
+```
 
 每一种类型的block调用copy后的结果如下所示
 
@@ -953,6 +986,84 @@ ARC下block属性的建议写法
 
 ![](OC底层原理/7/7.5_1.png)
 
+```
+typedef void (^MJBlock)(void);
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        MJBlock block;
+        {
+            MJPerson *person = [[MJPerson alloc] init];
+            person.age = 10;
+            
+//            __weak MJPerson *weakPerson = person;
+            int age = 10;
+            block = ^{
+                NSLog(@"---------%d", person.age);
+            };
+        }
+        NSLog(@"------");
+    }
+    return 0;
+}
+转化成c++代码
+int main(int argc, const char * argv[]) {
+    /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; 
+        MJBlock block;
+
+        {
+            MJPerson *person = ((MJPerson *(*)(id, SEL))(void *)objc_msgSend)((id)((MJPerson *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("MJPerson"), sel_registerName("alloc")), sel_registerName("init"));
+            ((void (*)(id, SEL, int))(void *)objc_msgSend)((id)person, sel_registerName("setAge:"), 10);
+
+
+            int age = 10;
+            block = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA, person, 570425344));
+        }
+
+        NSLog((NSString *)&__NSConstantStringImpl__var_folders_2r__m13fp2x2n9dvlr8d68yry500000gn_T_main_c41e64_mi_1);
+    }
+    return 0;
+}
+
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  MJPerson *__strong person;
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, MJPerson *__strong _person, int flags=0) : person(_person) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+struct __block_impl {
+  void *isa;
+  int Flags;
+  int Reserved;
+  void *FuncPtr;
+};
+
+static struct __main_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+  void (*dispose)(struct __main_block_impl_0*);
+} __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0};
+
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->person, (void*)src->person, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __main_block_dispose_0(struct __main_block_impl_0*src) {_Block_object_dispose((void*)src->person, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  MJPerson *__strong person = __cself->person; // bound by copy
+
+                NSLog((NSString *)&__NSConstantStringImpl__var_folders_2r__m13fp2x2n9dvlr8d68yry500000gn_T_main_c41e64_mi_0, ((int (*)(id, SEL))(void *)objc_msgSend)((id)person, sel_registerName("age")));
+            }
+
+```
+
+
 ## 7.6 __weak问题解决
 
 在使用clang转换OC为C++代码时，可能会遇到以下问题
@@ -966,6 +1077,110 @@ ARC下block属性的建议写法
 ## 7.7 __block修饰符
 
 ![](OC底层原理/7/7.7_1.png)
+
+* 注意 只有在需要修改auto变量的时候再添加__block。尽量不要使用，加了之后编译的代码复杂。
+
+```
+typedef void (^MJBlock)(void);
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        
+        __block int age = 10;
+        
+        MJBlock block = ^{
+            age = 20;
+            NSLog(@"age is %d", age);
+        };
+
+        /*
+        NSLog(@"age的地址 %p",&age);
+        __block int age底层转换成struct __Block_byref_age_0 age。
+        这个age的地址是struct __Block_byref_age_0中成员变量age的地址而不是，结构体的地址
+        隐藏的底层实现。
+
+        struct __main_block_impl_0 *blockImpl = (__bridge struct __main_block_impl_0 *)block;
+
+        p/x blockImpl->age
+        p/x blockImpl->age->age
+        （将block转成结构体，打印地址对比可知）
+        */
+        
+        block();
+    }
+    return 0;
+}
+
+转成c++
+int main(int argc, const char * argv[]) {
+    /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; 
+
+        __attribute__((__blocks__(byref))) __Block_byref_age_0 age = {
+            (void*)0,
+            (__Block_byref_age_0 *)&age,
+             0, 
+             sizeof(__Block_byref_age_0), 
+             10
+             };
+
+        MJBlock block = ((void (*)())&__main_block_impl_0(
+            (void *)__main_block_func_0, 
+            &__main_block_desc_0_DATA, 
+            (__Block_byref_age_0 *)&age, 
+            570425344//flag
+            ));
+
+        ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+
+    }
+    return 0;
+}
+
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  __Block_byref_age_0 *age; // by ref
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, __Block_byref_age_0 *_age, int flags=0) : age(_age->__forwarding) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+struct __block_impl {
+  void *isa;
+  int Flags;
+  int Reserved;
+  void *FuncPtr;
+};
+
+static struct __main_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+  void (*dispose)(struct __main_block_impl_0*);
+} __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0};
+
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->age, (void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);}
+
+static void __main_block_dispose_0(struct __main_block_impl_0*src) {_Block_object_dispose((void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);}
+
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  __Block_byref_age_0 *age = __cself->age; // bound by ref
+
+            (age->__forwarding->age) = 20;
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_wy_w7fw9cz93q584fpvsjv4g2z00000gn_T_main_43afa8_mi_0, (age->__forwarding->age));
+        }
+
+struct __Block_byref_age_0 {
+  void *__isa;
+__Block_byref_age_0 *__forwarding;
+ int __flags;
+ int __size;
+ int age;
+};
+```
 
 ## 7.8 __block的内存管理
 
@@ -986,6 +1201,8 @@ ARC下block属性的建议写法
 ![](OC底层原理/7/7.8_4.png)
 
 ## 7.9 __block的__forwarding指针
+
+如果栈上的block进行copy会复制到堆上，同时将引用的__block变量复制到堆上，__forwarding指针，保证不管访问堆、栈哪个__block变量，最终修改的都是堆上的__block变量。
 
 ![](OC底层原理/7/7.9_1.png)
 
@@ -1010,6 +1227,15 @@ _Block_object_dispose((void*)src->a, 8/*BLOCK_FIELD_IS_BYREF*/);
 对象类型的auto变量（假设变量名叫做p）
 _Block_object_dispose((void*)src->p, 3/*BLOCK_FIELD_IS_OBJECT*/);
 ```
+
+* 区别
+
+```
+block在堆上
+对象类型的auto变量，会根据__strong/__weak _Block_object_assign决定是强引用还是弱引用。
+__block变量，_Block_object_assign都是强引用。
+```
+
 ![](OC底层原理/7/7.10_1.png)
 
 ## 7.11 被__block修饰的对象类型
@@ -1027,6 +1253,15 @@ _Block_object_dispose((void*)src->p, 3/*BLOCK_FIELD_IS_OBJECT*/);
 ## 7.12 循环引用问题
 
 ![](OC底层原理/7/7.12_1.png)
+
+```
+__weak typeof(self) weakSelf = self;
+self.block = ^{
+    __strong typeof(weakSelf) strongSelf = weakSelf;
+    NSLog(@"age is %d",strongSelf.age);
+}
+加了__weak变量可能会在block调用之前已经释放，block内部是弱引用，可能无法访问到，需要用__strong保证weak变量在funcPtr未执行之前不会被释放。__strong也不是必须要加，如果weakself在block调用之前不会被释放，可以不加，加了也没问题。
+```
 
 ### 7.12.1 解决循环引用问题 - ARC
 
@@ -1047,3 +1282,27 @@ _Block_object_dispose((void*)src->p, 3/*BLOCK_FIELD_IS_OBJECT*/);
 * 用__block解决
 
 ![](OC底层原理/7/7.12.2_2.png)
+
+## 面试题
+
+### 1、block的原理是怎样的？本质是什么？
+
+```
+封装了函数调用以及调用环境的OC对象
+```
+
+### 2、__block的作用是什么？有什么使用注意点？
+
+### 3、block的属性修饰词为什么是copy？使用block有哪些使用注意？
+
+```
+block一旦没有进行copy操作，就不会在堆上
+使用注意：循环引用问题
+```
+
+### 4、block在修改NSMutableArray，需不需要添加__block？
+
+```
+__block是为了解决无法修改auto变量的问题。如果在block内部只是使用arr，比如添加元素，是不需要添加__block的，如果是block内重新生成一个NSArray，并赋值给block之前的auto变量，这个auto变量需要添加__block。
+```
+
