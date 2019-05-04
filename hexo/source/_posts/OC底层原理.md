@@ -216,8 +216,6 @@ p/x 0x001d8001000014c9 & 0x00007ffffffffff8（x86下ISA_MASK）
 ### 2.7.3 窥探struct objc_class的结构
 ![](OC底层原理/imgs/2/2.7_3.png)
 
-[objc_class的结构项目](./project/objc_class的结构)
-
 ## 面试题 
 
 * 对象的isa指针指向哪里？
@@ -289,8 +287,6 @@ meta-class对象的isa指向基类的meta-class对象
 }
 
 ```
-
-[KVODemo](./project/3.0_1)
 
 ## 3.1 未使用KVO监听的对象
 
@@ -1684,7 +1680,7 @@ p/x obj->isa可以查看每一位
 
 ![](OC底层原理/imgs/8/8.2.1_1.png)
 
-[MJClassInfo.h](OC底层原理/imgs/project/MJClassInfo.h)
+[MJClassInfo.h](project/MJClassInfo.h)
 
 * bits和isa相似，存储了很多信息。
 * MJClassInfo为了方便理解进行了简化，methods等是一维数组，真实类型为下面的二维数组。
@@ -1904,16 +1900,17 @@ struct method_t {
 
 ### 8.3.5 消息转发
 
+来到消息转发会调用函数\_\_forwarding__，内部会调用下图中的方法，\_\_forwarding__未开源，国外根据汇编写的伪代码如下
+原版
+[\_\_forwarding__.c](project/__forwarding__.c)
+删除部分逻辑的精简版
+[\_\_forwarding__clean.c](project/__forwarding__clean.c)
+
 ![](OC底层原理/imgs/8/8.3.5_1.png)
 
 * 生成NSMethodSignature
 
 ![](OC底层原理/imgs/8/8.3.5_2.png)
-
-* 消息转发没开源，国外根据汇编写的伪代码
-
-[\_\_forwarding__.c](OC底层原理/project/__forwarding__.c)
-[\_\_forwarding__clean.c](OC底层原理/project/__forwarding__clean.c)
 
 ```
 @interface MJPerson : NSObject
@@ -1971,6 +1968,187 @@ struct method_t {
 @end
 ```
 
+```
+@interface MJPerson : NSObject
+- (int)test:(int)age;
+@end
+
+#import <objc/runtime.h>
+#import "MJCat.h"
+
+@implementation MJPerson
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    if (aSelector == @selector(test:)) {
+//        return [NSMethodSignature signatureWithObjCTypes:"v20@0:8i16"];
+//省略大小，直接写类型
+        return [NSMethodSignature signatureWithObjCTypes:"i@:i"];
+//        return [[[MJCat alloc] init] methodSignatureForSelector:aSelector];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+// 如果能来到forwardInvocation，里面想干什么就干什么，比如只是NSLog，而不对anInvocation进行处理。调用的方法就是forwardInvocation中写的东西。
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+    // 参数顺序：receiver、selector、other arguments
+//    int age;
+//    [anInvocation getArgument:&age atIndex:2];
+//    NSLog(@"%d", age + 10);
+    
+    
+    // anInvocation.target == [[MJCat alloc] init]
+    // anInvocation.selector == test:
+    // anInvocation的参数：15
+    // [[[MJCat alloc] init] test:15]
+    
+    [anInvocation invokeWithTarget:[[MJCat alloc] init]];
+    
+    int ret;
+    [anInvocation getReturnValue:&ret];
+    
+    NSLog(@"%d", ret);
+}
+
+@interface MJCat : NSObject
+- (int)test:(int)age;
+@end
+
+#import "MJCat.h"
+
+@implementation MJCat
+- (int)test:(int)age
+{
+    return age * 2;
+}
+@end
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        MJPerson *person = [[MJPerson alloc] init];
+        [person test:15];
+    }
+    return 0;
+}
+```
+
+```
+@interface MJPerson : NSObject
++ (void)test;
+@end
+
+#import <objc/runtime.h>
+#import "MJCat.h"
+
+@implementation MJPerson
+
++ (id)forwardingTargetForSelector:(SEL)aSelector
+{
+
+    //objc_msgSend看receiver是什么类型，所以这里+、-方法都可以调。
+    //if (aSelector == @selector(test)) return [MJCat class];
+    // objc_msgSend([[MJCat alloc] init], @selector(test))
+    // [[[MJCat alloc] init] test]
+    if (aSelector == @selector(test)) return [[MJCat alloc] init];
+
+    return [super forwardingTargetForSelector:aSelector];
+}
+
+//+ (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+//{
+//    if (aSelector == @selector(test)) return [NSMethodSignature signatureWithObjCTypes:"v@:"];
+//    
+//    return [super methodSignatureForSelector:aSelector];
+//}
+//
+//+ (void)forwardInvocation:(NSInvocation *)anInvocation
+//{
+//    NSLog(@"1123");
+//}
+
+@end
+
+@interface MJCat : NSObject
++ (void)test;
+- (void)test;
+@end
+
+#import "MJCat.h"
+
+@implementation MJCat
+
++ (void)test
+{
+    NSLog(@"%s", __func__);
+}
+
+- (void)test
+{
+    NSLog(@"%s", __func__);
+}
+
+@end
+
+// 消息转发：将消息转发给别人
+// 元类对象是一种特殊的类对象
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        [MJPerson test];
+    }
+    return 0;
+}
+```
+
+```
+@interface MJPerson : NSObject
+- (void)run;
+- (void)test;
+- (void)other;
+@end
+
+#import "MJPerson.h"
+
+@implementation MJPerson
+
+- (void)run
+{
+    NSLog(@"run-123");
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    // 本来能调用的方法
+    if ([self respondsToSelector:aSelector]) {
+        return [super methodSignatureForSelector:aSelector];
+    }
+    
+    // 找不到的方法
+    return [NSMethodSignature signatureWithObjCTypes:"v@:"];
+}
+
+// 找不到的方法，都会来到这里
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+    NSLog(@"找不到%@方法", NSStringFromSelector(anInvocation.selector));
+}
+@end
+
+// NSProxy
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        MJPerson *person = [[MJPerson alloc] init];
+        //处理MJPerson未实现的方法
+        [person run];
+        [person test];
+        [person other];
+    }
+    return 0;
+}
+```
+
+
 ## 8.4 super
 
 ### 8.4.1 super的本质
@@ -1985,8 +2163,189 @@ struct objc_super2 {
 };
 ```
 
+>通过汇编可以看到，和clang转的c++代码objc_msgSendSuper有区别
+>objc_megSendSuper({self, class_getSuperclass(objc_getClass("MJStudent"))}, sel_registerName("class"))
+>objc_msgSendSuper2的第一个参数结构体是将当前类传进去，内部找到superclass
+
 * receiver是消息接收者
 * current_class是receiver的Class对象
+
+```
+MJStudent继承于MJPerson
+NSLog(@"[self class] = %@", [self class]); // MJStudent
+NSLog(@"[self superclass] = %@", [self superclass]); // MJPerson
+
+NSLog(@"--------------------------------");
+
+/*
+objc_megSendSuper({self, class_getSuperclass(objc_getClass("MJStudent"))}, sel_registerName("class"))
+// objc_msgSendSuper({self, [MJPerson class]}, @selector(class));
+class在NSObject中，class的底层实现
+@implementation NSObject
+
+- (Class)class {
+    return object_getClass(self);
+}
+
+所以NSLog(@"[super class] = %@", [super class]); 输出 MJStudent
+[super message]的底层实现
+1.消息接收者仍然是子类对象
+2.从父类开始查找方法的实现
+
+@end
+*/
+NSLog(@"[super class] = %@", [super class]); // MJStudent
+
+/*
+- (Class)superclass {
+    return class_getSuperclass(object_getClass(self));
+}
+**/
+NSLog(@"[super superclass] = %@", [super superclass]); // MJPerson
+```
+
+```
+#import <objc/runtime.h>
+
+//@implementation NSObject
+//
+//- (BOOL)isMemberOfClass:(Class)cls {
+//    return [self class] == cls;
+//}
+//
+//- (BOOL)isKindOfClass:(Class)cls {
+//    for (Class tcls = [self class]; tcls; tcls = tcls->superclass) {
+//        if (tcls == cls) return YES;
+//    }
+//    return NO;
+//}
+//
+//
+//+ (BOOL)isMemberOfClass:(Class)cls {
+//    return object_getClass((id)self) == cls;
+//}
+//
+//
+//+ (BOOL)isKindOfClass:(Class)cls {
+//    for (Class tcls = object_getClass((id)self); tcls; tcls = tcls->superclass) {
+//        if (tcls == cls) return YES;
+//    }
+//    return NO;
+//}
+//@end
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+//        NSLog(@"%d", [[NSObject class] isKindOfClass:[NSObject class]]);
+//        NSLog(@"%d", [[NSObject class] isMemberOfClass:[NSObject class]]);
+//        NSLog(@"%d", [[MJPerson class] isKindOfClass:[MJPerson class]]);
+//        NSLog(@"%d", [[MJPerson class] isMemberOfClass:[MJPerson class]]);
+        
+        
+        // 这句代码的方法调用者不管是哪个类（只要是NSObject体系下的），都返回YES
+        NSLog(@"%d", [NSObject isKindOfClass:[NSObject class]]); // 1
+        NSLog(@"%d", [NSObject isMemberOfClass:[NSObject class]]); // 0
+        NSLog(@"%d", [MJPerson isKindOfClass:[MJPerson class]]); // 0
+        NSLog(@"%d", [MJPerson isMemberOfClass:[MJPerson class]]); // 0
+        
+        
+//        id person = [[MJPerson alloc] init];
+        
+//        NSLog(@"%d", [person isMemberOfClass:[MJPerson class]]);
+//        NSLog(@"%d", [person isMemberOfClass:[NSObject class]]);
+        
+//        NSLog(@"%d", [person isKindOfClass:[MJPerson class]]);
+//        NSLog(@"%d", [person isKindOfClass:[NSObject class]]);
+        
+        
+//        NSLog(@"%d", [MJPerson isMemberOfClass:object_getClass([MJPerson class])]);
+//        NSLog(@"%d", [MJPerson isKindOfClass:object_getClass([NSObject class])]);
+        
+        //基类的元类对象的supperclass就是基类
+//        NSLog(@"%d", [MJPerson isKindOfClass:[NSObject class]]);//1 
+    }
+    return 0;
+}
+```
+
+>isKindOfClass、isMemberOfClass左边是实例对象，右边需要传类对象；左边是类对象，右边需要传元类对象。用以比较类对象和元类对象。
+>特殊情况：
+>下面这句代码的方法调用者不管是哪个类（只要是NSObject体系下的），都返回YES
+>[NSObject isKindOfClass:[NSObject class]]
+
+```
+@interface MJPerson : NSObject
+@property (copy, nonatomic) NSString *name;
+- (void)print;
+@end
+
+#import "MJPerson.h"
+@implementation MJPerson
+- (void)print {
+    NSLog(@"my name is %@", self->_name);
+}
+@end
+
+// ViewController.m中的方法
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+//    NSString *test = @"123";
+
+     //以下编译会报错么？打印结果是什么？
+
+       /*
+     1. 没有初始化实例对象，print为什么能够调用成功？
+     2. 为什么print方法中的self.name变成了ViewController等其他内容。（打印结果和viewDidLoad方法前面的内容有关）
+     3. 和通过实例对象调用方法有什么相同和区别。
+     */
+    id cls = [MJPerson class];
+    void *obj = &cls;
+    [(__bridge id)obj print];
+    //obj->cls->[MJPerson class];
+
+    MJPerson *person = [[MJPerson alloc] init];
+    [person print];
+    //person->person实例变量的isa指针（实例变量是一个结构体，第一个成员变量isa,第二个成员变量_name，实例变量的地址和isa指针的地址相同。）->[MJPerson class]，上面的cls和isa很像，都指向[MJPerson class]
+
+    // 局部变量分配在栈空间
+    // 栈空间分配，从高地址到低地址
+    //*
+      void test() {
+          long long a = 4; // 0x7ffee638bff8
+          long long b = 5; // 0x7ffee638bff0
+          long long c = 6; // 0x7ffee638bfe8
+          long long d = 7; // 0x7ffee638bfe0
+          
+          NSLog(@"%p %p %p %p", &a, &b, &c, &d);
+      }
+    **/
+
+//    struct MJPerson_IMPL
+//    {
+//        Class isa;
+//        NSString *_name;
+//    };
+    print方法中self.name是通过指向的地址内存忽略前八个字节找到_name地址。
+    self.name中的其实是obj->name。obj的地址+8，找到的是test变量的地址。如果[super viewDidLoad]下面没有添加局部变量，打印my name is <ViewController: 0x...>
+
+    分析：
+    [super viewDidLoad];
+    转成：
+   struct abc = {
+       self,
+       [ViewController class]
+       };
+       //查看xcode汇编代码发现super 转成 objc_msgSendSuper2
+    objc_msgSendSuper2(abc, @selector(viewDidLoad));
+    有一个影藏的局部变量，struct abc，
+    self.name-> obj->_name -> abc中的self
+
+    
+//    long long *p = (long long *)obj;
+//    NSLog(@"%p %p", *(p+2), [ViewController class]);
+}
+```
 
 ### 8.4.2 LLVM的中间代码（IR）
 
@@ -2137,6 +2496,33 @@ SEL sel_registerName(const char *str)
 IMP imp_implementationWithBlock(id block)
 id imp_getBlock(IMP anImp)
 BOOL imp_removeBlock(IMP anImp)
+```
+
+## 面试题
+
+### 1、讲一下 OC 的消息机制
+
+```
+OC中的方法调用其实都是转成了objc_msgSend函数的调用，给receiver（方法调用者）发送了一条消息（selector方法名）
+objc_msgSend底层有3大阶段
+消息发送（当前类、父类中查找）、动态方法解析、消息转发
+```
+
+### 2、消息转发机制流程
+
+### 3、消息转发机制流程
+
+```
+OC是一门动态性比较强的编程语言，允许很多操作推迟到程序运行时再进行
+OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的API，封装了很多动态性相关的函数
+平时编写的OC代码，底层都是转换成了Runtime API进行调用
+
+具体应用
+利用关联对象（AssociatedObject）给分类添加属性
+遍历类的所有成员变量（修改textfield的占位文字颜色、字典转模型、自动归档解档）
+交换方法实现（交换系统的方法）
+利用消息转发机制解决方法找不到的异常问题
+......
 ```
 
 
