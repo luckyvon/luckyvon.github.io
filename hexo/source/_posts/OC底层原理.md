@@ -1766,7 +1766,11 @@ p (IMP)(上面log出来的imp地址)
 
 ## 8.3 objc_msgSend
 
+>sel_registerName("test")等价于@selector(test)
+>c语言转汇编会在方法名称前加一个_
+
 ### 8.3.1 执行流程
+
 * OC中的方法调用，其实都是转换为objc_msgSend函数的调用
 * objc_msgSend的执行流程可以分为3大阶段
   * 消息发送
@@ -1812,6 +1816,92 @@ p (IMP)(上面log出来的imp地址)
 
 ![](OC底层原理/imgs/8/8.3.4_2.png)
 
+```
+@interface MJPerson : NSObject
+//- (void)test;
++ (void)test;
+@end
+
+#import "MJPerson.h"
+#import <objc/runtime.h>
+
+@implementation MJPerson
+
+//void c_other(id self, SEL _cmd)
+//{
+//    NSLog(@"c_other - %@ - %@", self, NSStringFromSelector(_cmd));
+//}
+//
+//+ (BOOL)resolveClassMethod:(SEL)sel
+//{
+//    if (sel == @selector(test)) {
+//        // 第一个参数是object_getClass(self)
+//        class_addMethod(object_getClass(self), sel, (IMP)c_other, "v16@0:8");
+//        return YES;
+//    }
+//    return [super resolveClassMethod:sel];
+//}
+
+//+ (BOOL)resolveInstanceMethod:(SEL)sel
+//{
+//    if (sel == @selector(test)) {
+//        // 动态添加test方法的实现
+//        class_addMethod(self, sel, (IMP)c_other, "v16@0:8");
+//
+//        // 返回YES代表有动态添加方法
+//        return YES;
+//    }
+//    return [super resolveInstanceMethod:sel];
+//}
+
+//- (void)other
+//{
+//    NSLog(@"%s", __func__);
+//}
+//
+//+ (BOOL)resolveInstanceMethod:(SEL)sel
+//{
+//    if (sel == @selector(test)) {
+//        // 获取其他方法
+//        Method method = class_getInstanceMethod(self, @selector(other));
+//
+//        // 动态添加test方法的实现
+//        class_addMethod(self, sel,
+//                        method_getImplementation(method),
+//                        method_getTypeEncoding(method));
+//
+//        // 返回YES代表有动态添加方法
+//        return YES;
+//    }
+//    return [super resolveInstanceMethod:sel];
+//}
+
+// typedef struct objc_method *Method;
+// struct objc_method == struct method_t
+//        struct method_t *otherMethod = (struct method_t *)class_getInstanceMethod(self, @selector(other));
+
+struct method_t {
+    SEL sel;
+    char *types;
+    IMP imp;
+};
+
+//+ (BOOL)resolveInstanceMethod:(SEL)sel
+//{
+//    if (sel == @selector(test)) {
+//        // 获取其他方法
+//        struct method_t *method = (struct method_t *)class_getInstanceMethod(self, @selector(other));
+//
+//        // 动态添加test方法的实现
+//        class_addMethod(self, sel, method->imp, method->types);
+//
+//        // 返回YES代表有动态添加方法
+//        return YES;
+//    }
+//    return [super resolveInstanceMethod:sel];
+//}
+```
+
 ### 8.3.5 消息转发
 
 ![](OC底层原理/imgs/8/8.3.5_1.png)
@@ -1819,6 +1909,67 @@ p (IMP)(上面log出来的imp地址)
 * 生成NSMethodSignature
 
 ![](OC底层原理/imgs/8/8.3.5_2.png)
+
+* 消息转发没开源，国外根据汇编写的伪代码
+
+[\_\_forwarding__.c](OC底层原理/project/__forwarding__.c)
+[\_\_forwarding__clean.c](OC底层原理/project/__forwarding__clean.c)
+
+```
+@interface MJPerson : NSObject
+- (void)test;
+@end
+#import "MJPerson.h"
+#import <objc/runtime.h>
+#import "MJCat.h"
+
+@implementation MJPerson
+
+//- (id)forwardingTargetForSelector:(SEL)aSelector
+//{
+//    if (aSelector == @selector(test)) {
+//        // objc_msgSend([[MJCat alloc] init], aSelector)
+//        return [[MJCat alloc] init];
+//    }
+//    return [super forwardingTargetForSelector:aSelector];
+//}
+
+// 方法签名：返回值类型、参数类型
+//- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+//{
+//    if (aSelector == @selector(test)) {
+//        return [NSMethodSignature signatureWithObjCTypes:"v16@0:8"];
+//    }
+//    return [super methodSignatureForSelector:aSelector];
+//}
+
+// NSInvocation封装了一个方法调用，包括：方法调用者、方法名、方法参数
+//    anInvocation.target 方法调用者
+//    anInvocation.selector 方法名
+//    [anInvocation getArgument:NULL atIndex:0]
+//- (void)forwardInvocation:(NSInvocation *)anInvocation
+//{
+////    anInvocation.target = [[MJCat alloc] init];
+////    [anInvocation invoke];
+//
+//    [anInvocation invokeWithTarget:[[MJCat alloc] init]];
+//}
+
+@end
+
+@interface MJCat : NSObject
+- (void)test;
+@end
+
+#import "MJCat.h"
+
+@implementation MJCat
+- (void)test
+{
+    NSLog(@"%s", __func__);
+}
+@end
+```
 
 ## 8.4 super
 
