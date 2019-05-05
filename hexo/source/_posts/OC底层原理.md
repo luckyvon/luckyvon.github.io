@@ -2525,9 +2525,458 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 ......
 ```
 
+# 9、RunLoop
 
+## 9.1 简介
 
+### 9.1.1 什么是RunLoop
 
+* 顾名思义
+  * 运行循环
+  * 在程序运行过程中循环做一些事情
+* 应用范畴
+  * 定时器（Timer）、PerformSelector
+  * GCD Async Main Queue
+  * 事件响应、手势识别、界面刷新
+  * 网络请求
+  * AutoreleasePool
 
+### 9.1.2 如果没有RunLoop
 
+![](OC底层原理/imgs/9/9.1.2_1.png)
+
+* 执行完第13行代码后，会即将退出程序
+
+### 9.1.3 如果有了RunLoop
+
+![](OC底层原理/imgs/9/9.1.3_1.png)
+![](OC底层原理/imgs/9/9.1.3_2.png)
+
+程序并不会马上退出，而是保持运行状态
+
+* RunLoop的基本作用
+  * 保持程序的持续运行
+  * 处理App中的各种事件（比如触摸事件、定时器事件等）
+  * 节省CPU资源，提高程序性能：该做事时做事，该休息时休息
+  * ......
+
+## 9.2 RunLoop对象
+
+* iOS中有2套API来访问和使用RunLoop
+  * Foundation：NSRunLoop
+  * Core Foundation：CFRunLoopRef
+
+* NSRunLoop和CFRunLoopRef都代表着RunLoop对象
+  * NSRunLoop是基于CFRunLoopRef的一层OC包装
+  * CFRunLoopRef是开源的。[CFRunLoopRef](https://opensource.apple.com/tarballs/CF/
+)
+
+### 9.2.1 RunLoop与线程
+
+* 每条线程都有唯一的一个与之对应的RunLoop对象
+
+* RunLoop保存在一个全局的Dictionary里，线程作为key，RunLoop作为value
+
+* 线程刚创建时并没有RunLoop对象，RunLoop会在第一次获取它时创建
+
+* RunLoop会在线程结束时销毁
+
+* 主线程的RunLoop已经自动获取（创建），子线程默认没有开启RunLoop
+
+### 9.2.2 获取RunLoop对象
+
+* Foundation
+  * [NSRunLoop currentRunLoop]; // 获得当前线程的RunLoop对象
+  * [NSRunLoop mainRunLoop]; // 获得主线程的RunLoop对象
+
+* Core Foundation
+  * CFRunLoopGetCurrent(); // 获得当前线程的RunLoop对象
+  * CFRunLoopGetMain(); // 获得主线程的RunLoop对象
+
+## 9.3 Mode
+
+### 9.3.1 RunLoop相关的类
+
+![](OC底层原理/imgs/9/9.3.1_1.png)
+
+### 9.3.2 CFRunLoopModeRef
+
+* CFRunLoopModeRef代表RunLoop的运行模式
+
+* 一个RunLoop包含若干个Mode，每个Mode又包含若干个Source0/Source1/Timer/Observer
+
+* RunLoop启动时只能选择其中一个Mode，作为currentMode
+
+* 如果需要切换Mode，只能退出当前Loop，再重新选择一个Mode进入
+  * 不同组的Source0/Source1/Timer/Observer能分隔开来，互不影响
+
+* 如果Mode里没有任何Source0/Source1/Timer/Observer，RunLoop会立马退出
+
+* 常见的2种Mode
+  * kCFRunLoopDefaultMode（NSDefaultRunLoopMode）：App的默认Mode，通常主线程是在这个Mode下运行
+
+  * UITrackingRunLoopMode：界面跟踪 Mode，用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他 Mode 影响
+
+### 9.3.3 CFRunLoopObserverRef
+
+![](OC底层原理/imgs/9/9.3.3_1.png)
+
+### 9.3.4 添加Observer监听RunLoop的所有状态
+
+![](OC底层原理/imgs/9/9.3.4_1.png)
+
+## 9.4 RunLoop的运行逻辑
+
+![](OC底层原理/imgs/9/9.4_1.png)
+![](OC底层原理/imgs/9/9.4_2.png)
+![](OC底层原理/imgs/9/9.4_3.png)
+![](OC底层原理/imgs/9/9.4_4.png)
+
+## 9.5 RunLoop在实际开中的应用
+
+* 控制线程生命周期（线程保活）
+* 解决NSTimer在滑动时停止工作的问题
+* 监控应用卡顿
+* 性能优化
+
+## 面试题
+
+### 1、讲讲 RunLoop，项目中有用到吗？
+
+### 2、runloop内部实现逻辑？
+
+### 3、runloop和线程的关系？
+
+### 4、timer 与 runloop 的关系？
+
+### 5、程序中添加每3秒响应一次的NSTimer，当拖动tableview时timer可能无法响应要怎么解决？
+
+### 6、runloop 是怎么响应用户操作的， 具体流程是什么样的？
+
+### 7、说说runLoop的几种状态
+
+### 8、runloop的mode作用是什么？
+
+# 10、多线程
+
+## 10.1 方案
+
+### 10.1.1 iOS中的常见多线程方案
+
+![](OC底层原理/imgs/10/10.1.1_1.png)
+
+### 10.1.2 GCD的常用函数
+
+```
+GCD中有2个用来执行任务的函数
+用同步的方式执行任务
+dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);
+queue：队列
+block：任务
+
+用异步的方式执行任务
+dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
+```
+[GCD源码](https://github.com/apple/swift-corelibs-libdispatch)
+
+### 10.1.3 GCD的队列
+* GCD的队列可以分为2大类型
+  * 并发队列（Concurrent Dispatch Queue）
+    * 可以让多个任务并发（同时）执行（自动开启多个线程同时执行任务）
+    * 并发功能只有在异步（dispatch_async）函数下才有效
+
+  * 串行队列（Serial Dispatch Queue）
+    * 让任务一个接着一个地执行（一个任务执行完毕后，再执行下一个任务）
+
+### 10.1.4 容易混淆的术语
+
+![](OC底层原理/imgs/10/10.1.4_1.png)
+
+### 10.1.5 各种队列的执行效果
+
+![](OC底层原理/imgs/10/10.1.5_1.png)
+
+## 10.2 队列组的使用
+
+* 思考：如何用gcd实现以下功能
+  * 异步并发执行任务1、任务2
+  * 等任务1、任务2都执行完毕后，再回到主线程执行任务3
+
+![](OC底层原理/imgs/10/10.2_1.png)
+
+## 10.3 线程同步
+
+### 10.3.1 多线程的安全隐患
+
+* 资源共享
+  * 1块资源可能会被多个线程共享，也就是多个线程可能会访问同一块资源
+  * 比如多个线程访问同一个对象、同一个变量、同一个文件
+* 当多个线程访问同一块资源时，很容易引发数据错乱和数据安全问题
+
+### 10.3.2 存钱取钱
+
+![](OC底层原理/imgs/10/10.3.2_1.png)
+
+### 10.3.3 卖票
+
+![](OC底层原理/imgs/10/10.3.3_1.png)
+
+### 10.3.4 多线程安全隐患分析
+
+![](OC底层原理/imgs/10/10.3.4_1.png)
+
+### 10.3.5 多线程安全隐患的解决方案
+
+* 解决方案：使用线程同步技术（同步，就是协同步调，按预定的先后次序进行）
+* 常见的线程同步技术是：加锁
+  
+![](OC底层原理/imgs/10/10.3.5_1.png)
+
+## 10.4 线程同步方案
+
+### 10.4.1 iOS中的线程同步方案
+* OSSpinLock
+* os_unfair_lock
+* pthread_mutex
+* dispatch_semaphore
+* dispatch_queue(DISPATCH_QUEUE_SERIAL)
+* NSLock
+* NSRecursiveLock
+* NSCondition
+* NSConditionLock
+* @synchronized
+
+### 10.4.2 GNUstep
+* GNUstep是GNU计划的项目之一，它将Cocoa的OC库重新开源实现了一遍
+* [源码地址](http://www.gnustep.org/resources/downloads.php)
+* 虽然GNUstep不是苹果官方源码，但还是具有一定的参考价值
+
+### 10.4.3 OSSpinLock
+* OSSpinLock叫做”自旋锁”，等待锁的线程会处于忙等（busy-wait）状态，一直占用着CPU资源
+* 目前已经不再安全，可能会出现优先级反转问题
+  * 如果等待锁的线程优先级较高，它会一直占用着CPU资源，优先级低的线程就无法释放锁
+  * 需要导入头文件#import <libkern/OSAtomic.h>
+
+![](OC底层原理/imgs/10/10.4.3_1.png)
+
+### 10.4.4 os_unfair_lock
+* os_unfair_lock用于取代不安全的OSSpinLock ，从iOS10开始才支持
+* 从底层调用看，等待os_unfair_lock锁的线程会处于休眠状态，并非忙等
+* 需要导入头文件#import <os/lock.h>
+
+![](OC底层原理/imgs/10/10.4.4_1.png)
+
+### 10.4.5 pthread_mutex
+* mutex叫做”互斥锁”，等待锁的线程会处于休眠状态
+* 需要导入头文件#import <pthread.h>
+
+![](OC底层原理/imgs/10/10.4.5_1.png)
+![](OC底层原理/imgs/10/10.4.5_2.png)
+
+* 递归锁
+
+![](OC底层原理/imgs/10/10.4.5_3.png)
+
+* 条件
+
+![](OC底层原理/imgs/10/10.4.5_4.png)
+
+### 10.4.6 NSLock、NSRecursiveLock
+
+![](OC底层原理/imgs/10/10.4.6_1.png)
+
+### 10.4.7 NSCondition
+* NSCondition是对mutex和cond的封装
+
+![](OC底层原理/imgs/10/10.4.7_1.png)
+
+### 10.4.8 NSConditionLock
+
+* NSConditionLock是对NSCondition的进一步封装，可以设置具体的条件值
+
+![](OC底层原理/imgs/10/10.4.8_1.png)
+
+### 10.4.9 dispatch_semaphore
+* semaphore叫做”信号量”
+* 信号量的初始值，可以用来控制线程并发访问的最大数量
+* 信号量的初始值为1，代表同时只允许1条线程访问资源，保证线程同步
+
+![](OC底层原理/imgs/10/10.4.9_1.png)
+
+### 10.4.10 dispatch_queue
+* 直接使用GCD的串行队列，也是可以实现线程同步的
+
+![](OC底层原理/imgs/10/10.4.10_1.png)
+
+### 10.4.11 @synchronized
+* @synchronized是对mutex递归锁的封装
+* 源码查看：objc4中的objc-sync.mm文件
+* @synchronized(obj)内部会生成obj对应的递归锁，然后进行加锁、解锁操作
+```
+@synchronized(obj) {
+    //任务
+}
+```
+
+### 10.4.12 iOS线程同步方案性能比较
+* 性能从高到低排序
+  * os_unfair_lock
+  * OSSpinLock
+  * dispatch_semaphore
+  * pthread_mutex
+  * dispatch_queue(DISPATCH_QUEUE_SERIAL)
+  * NSLock
+  * NSCondition
+  * pthread_mutex(recursive)
+  * NSRecursiveLock
+  * NSConditionLock
+  * @synchronized
+
+### 10.4.13 自旋锁、互斥锁比较
+
+* 什么情况使用自旋锁比较划算？
+  * 预计线程等待锁的时间很短
+  * 加锁的代码（临界区）经常被调用，但竞争情况很少发生
+  * CPU资源不紧张
+  * 多核处理器
+
+* 什么情况使用互斥锁比较划算？
+  * 预计线程等待锁的时间较长
+  * 单核处理器
+  * 临界区有IO操作
+  * 临界区代码复杂或者循环量大
+  * 临界区竞争非常激烈
+
+## 10.5 atomic
+atomic用于保证属性setter、getter的原子性操作，相当于在getter和setter内部加了线程同步的锁
+
+可以参考源码objc4的objc-accessors.mm  
+
+它并不能保证使用属性的过程是线程安全的
+
+## 10.6 读写安全
+### 10.6.1 iOS中的读写安全方案
+
+* 思考如何实现以下场景
+  * 同一时间，只能有1个线程进行写的操作
+  * 同一时间，允许有多个线程进行读的操作
+  * 同一时间，不允许既有写的操作，又有读的操作
+
+* 上面的场景就是典型的“多读单写”，经常用于文件等数据的读写操作，iOS中的实现方案有
+  * pthread_rwlock：读写锁
+  * dispatch_barrier_async：异步栅栏调用
+
+### 10.6.2 pthread_rwlock
+* 等待锁的线程会进入休眠
+
+![](OC底层原理/imgs/10/10.6.2_1.png)
+
+### 10.6.3 dispatch_barrier_async
+* 这个函数传入的并发队列必须是自己通过dispatch_queue_cretate创建的
+* 如果传入的是一个串行或是一个全局的并发队列，那这个函数便等同于dispatch_async函数的效果
+
+![](OC底层原理/imgs/10/10.6.3_1.png)
+
+# 11、内存管理
+## 11.1 定时器
+### 11.1.1 CADisplayLink、NSTimer使用注意
+![](OC底层原理/imgs/10/11.1.1_1.png)
+
+### 11.1.2 GCD定时器
+* NSTimer依赖于RunLoop，如果RunLoop的任务过于繁重，可能会导致NSTimer不准时
+* 而GCD的定时器会更加准时
+
+![](OC底层原理/imgs/10/11.1.2_1.png)
+
+## 11.2 内存布局
+
+### 11.2.1 iOS程序的内存布局
+
+![](OC底层原理/imgs/10/11.2.1_1.png)
+
+### 11.2.2 Tagged Pointer
+从64bit开始，iOS引入了Tagged Pointer技术，用于优化NSNumber、NSDate、NSString等小对象的存储
+
+在没有使用Tagged Pointer之前， NSNumber等对象需要动态分配内存、维护引用计数等，NSNumber指针存储的是堆中NSNumber对象的地址值
+
+使用Tagged Pointer之后，NSNumber指针里面存储的数据变成了：Tag + Data，也就是将数据直接存储在了指针中
+
+当指针不够存储数据时，才会使用动态分配内存的方式来存储数据
+
+objc_msgSend能识别Tagged Pointer，比如NSNumber的intValue方法，直接从指针提取数据，节省了以前的调用开销
+
+如何判断一个指针是否为Tagged Pointer？
+iOS平台，最高有效位是1（第64bit）
+Mac平台，最低有效位是1
+
+### 11.2.3 判断是否为Tagged Pointer
+![](OC底层原理/imgs/10/11.2.3_1.png)
+![](OC底层原理/imgs/10/11.2.3_2.png)
+
+## 11.3 对象的内存管理
+
+### 11.3.1 OC对象的内存管理
+在iOS中，使用引用计数来管理OC对象的内存
+
+一个新创建的OC对象引用计数默认是1，当引用计数减为0，OC对象就会销毁，释放其占用的内存空间
+
+调用retain会让OC对象的引用计数+1，调用release会让OC对象的引用计数-1
+
+内存管理的经验总结
+当调用alloc、new、copy、mutableCopy方法返回了一个对象，在不需要这个对象时，要调用release或者autorelease来释放它
+想拥有某个对象，就让它的引用计数+1；不想再拥有某个对象，就让它的引用计数-1
+
+可以通过以下私有函数来查看自动释放池的情况
+extern void _objc_autoreleasePoolPrint(void);
+
+![](OC底层原理/imgs/10/11.3.1_1.png)
+![](OC底层原理/imgs/10/11.3.1_2.png)
+
+### 11.3.2 copy和mutableCopy
+![](OC底层原理/imgs/10/11.3.2_1.png)
+
+### 11.3.3 引用计数的存储
+
+![](OC底层原理/imgs/10/11.3.3_1.png)
+
+### 11.3.4 dealloc
+当一个对象要释放时，会自动调用dealloc，接下的调用轨迹是
+
+dealloc
+_objc_rootDealloc
+rootDealloc
+object_dispose
+objc_destructInstance、free
+
+![](OC底层原理/imgs/10/11.3.4_1.png)
+
+## 11.4 自动释放池
+
+### 11.4.1 自动释放池
+自动释放池的主要底层数据结构是：__AtAutoreleasePool、AutoreleasePoolPage
+
+调用了autorelease的对象最终都是通过AutoreleasePoolPage对象来管理的
+
+源码分析
+clang重写@autoreleasepool
+objc4源码：NSObject.mm
+
+![](OC底层原理/imgs/10/11.4.1_1.png)
+
+### 11.4.2 AutoreleasePoolPage的结构
+
+![](OC底层原理/imgs/10/11.4.2_1.png)
+
+调用push方法会将一个POOL_BOUNDARY入栈，并且返回其存放的内存地址
+
+调用pop方法时传入一个POOL_BOUNDARY的内存地址，会从最后一个入栈的对象开始发送release消息，直到遇到这个POOL_BOUNDARY
+
+id *next指向了下一个能存放autorelease对象地址的区域  
+
+### 11.4.3 Runloop和Autorelease
+iOS在主线程的Runloop中注册了2个Observer
+第1个Observer监听了kCFRunLoopEntry事件，会调用objc_autoreleasePoolPush()
+第2个Observer
+监听了kCFRunLoopBeforeWaiting事件，会调用objc_autoreleasePoolPop()、objc_autoreleasePoolPush()
+监听了kCFRunLoopBeforeExit事件，会调用objc_autoreleasePoolPop()
 
