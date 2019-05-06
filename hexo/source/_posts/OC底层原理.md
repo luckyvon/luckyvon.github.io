@@ -2577,7 +2577,7 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 
 * RunLoop保存在一个全局的Dictionary里，线程作为key，RunLoop作为value
 
-* 线程刚创建时并没有RunLoop对象，RunLoop会在第一次获取它时创建
+* 线程刚创建时并没有RunLoop对象，RunLoop会在第一次获取它时创建（调用[NSRunLoop CurrentRunLoop]或者CFRunLoopGetCurrent()）
 
 * RunLoop会在线程结束时销毁
 
@@ -2617,6 +2617,8 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 
   * UITrackingRunLoopMode：界面跟踪 Mode，用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他 Mode 影响
 
+>lldb命令 bt可以打印隐藏的函数调用栈。
+
 ### 9.3.3 CFRunLoopObserverRef
 
 ![](OC底层原理/imgs/9/9.3.3_1.png)
@@ -2630,7 +2632,32 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 ![](OC底层原理/imgs/9/9.4_1.png)
 ![](OC底层原理/imgs/9/9.4_2.png)
 ![](OC底层原理/imgs/9/9.4_3.png)
+
+* 04中的block  CFRunLoopPerformBlock(`CFRunLoopRef rl`,`CFTypeRef mode`,`^(void)block`)
+* 新建一个Single View App项目。在ViewController添加touchBegin方法，在方法中添加一个断点，运行点击屏幕，来到断点。lldb中执行bt命名，就可以看到被xcode影藏的详细调用栈，找到runloop入口函数CFRunLoopRunSpecific，然后去上面的runloop源码中搜索。
+* 07休眠，通过mach_msg调用内核api让当前线程休眠，不做任何事情。while(1)虽然也阻塞线程，但是线程一直在循环执行，没有真正的休眠。
+
+* 休眠原理
 ![](OC底层原理/imgs/9/9.4_4.png)
+
+```
+...
+在ViewController上添加一个UITextView，并滑动UITextView
+...
+switch(activity) {
+    case kcfRunLoopEntry: {
+        CFRunLoopMode mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent());
+        NSLog(@"kCFRunLoopEntry - %@",mode);
+        break;
+    }
+    case kCFRunLoopExit: {
+        CFRunLoopMode mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent());
+        NSLog(@"kCFRunLoopExit - %@",mode);
+        break;
+    }
+}
+观察UITextView=滚动过程mode切换。滚动时为UITrackingRunLoopMode，停止滚动为kCFRunLoopDefaultMode
+```
 
 ## 9.5 RunLoop在实际开中的应用
 
