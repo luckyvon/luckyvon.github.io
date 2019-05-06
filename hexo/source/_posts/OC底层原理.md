@@ -2599,6 +2599,8 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 
 ![](OC底层原理/imgs/9/9.3.1_1.png)
 
+>_commonModes放的是NSRunLoopCommonModes表示的modes即NSDefaultRunLoopMode、UITrackingRunLoopMode两个，当模式为commonModes就去_commonModes查找。_commonModelItems为标记为NSRunLoopCommonModes的对象。
+
 ### 9.3.2 CFRunLoopModeRef
 
 * CFRunLoopModeRef代表RunLoop的运行模式
@@ -2635,7 +2637,74 @@ OC的动态性就是由Runtime来支撑和实现的，Runtime是一套C语言的
 ## 9.5 RunLoop在实际开中的应用
 
 * 控制线程生命周期（线程保活）
+
+```
+@interface MJThread : NSThread
+@end
+#import "MJThread.h"
+@implementation MJThread
+- (void)dealloc
+{
+    NSLog(@"%s", __func__);
+}
+@end
+
+#import "ViewController.h"
+#import "MJThread.h"
+
+@interface ViewController ()
+@property (strong, nonatomic) MJThread *thread;
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.thread = [[MJThread alloc] initWithTarget:self selector:@selector(run) object:nil];
+    [self.thread start];
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self performSelector:@selector(test) onThread:self.thread withObject:nil waitUntilDone:NO];
+}
+
+// 子线程需要执行的任务
+- (void)test
+{
+    NSLog(@"%s %@", __func__, [NSThread currentThread]);
+}
+
+// 这个方法的目的：线程保活
+- (void)run {
+    NSLog(@"%s %@", __func__, [NSThread currentThread]);
+    
+    // 往RunLoop里面添加Source\Timer\Observer
+    [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc] init] forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] run];
+    
+    NSLog(@"%s ----end----", __func__);
+}
+@end
+```
+
 * 解决NSTimer在滑动时停止工作的问题
+
+```
+static int count = 0;
+NSTimer *timer = [NSTimer timerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
+    NSLog(@"%d", ++count);
+}];
+//    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+//    [[NSRunLoop currentRunLoop] addTimer:timer forMode:UITrackingRunLoopMode];
+    
+// NSDefaultRunLoopMode、UITrackingRunLoopMode才是真正存在的模式
+// NSRunLoopCommonModes并不是一个真的模式，它只是一个标记
+// timer能在_commonModes数组中存放的模式下工作
+[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+```
+
 * 监控应用卡顿
 * 性能优化
 
