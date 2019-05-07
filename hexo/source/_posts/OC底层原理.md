@@ -2681,6 +2681,7 @@ switch(activity) {
 
 @interface ViewController ()
 @property (strong, nonatomic) MJThread *thread;
+@property (assign, nonatomic, getter=isStoped) BOOL stopped;
 @end
 
 @implementation ViewController
@@ -2688,7 +2689,28 @@ switch(activity) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.thread = [[MJThread alloc] initWithTarget:self selector:@selector(run) object:nil];
+    __weak typeof(self) weakSelf = self;
+    
+    self.stopped = NO;
+    self.thread = [[MJThread alloc] initWithBlock:^{
+        NSLog(@"%@----begin----", [NSThread currentThread]);
+        
+        // 往RunLoop里面添加Source\Timer\Observer
+        [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc] init] forMode:NSDefaultRunLoopMode];
+        while (!weakSelf.isStoped) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+        
+        NSLog(@"%@----end----", [NSThread currentThread]);
+        
+        // NSRunLoop的run方法是无法停止的，它专门用于开启一个永不销毁的线程（NSRunLoop）
+        //        [[NSRunLoop currentRunLoop] run];
+        /*
+         it runs the receiver in the NSDefaultRunLoopMode by repeatedly invoking runMode:beforeDate:.
+         In other words, this method effectively begins an infinite loop that processes data from the run loop’s input sources and timers
+         */
+        
+    }];
     [self.thread start];
 }
 
@@ -2703,16 +2725,31 @@ switch(activity) {
     NSLog(@"%s %@", __func__, [NSThread currentThread]);
 }
 
-// 这个方法的目的：线程保活
-- (void)run {
-    NSLog(@"%s %@", __func__, [NSThread currentThread]);
-    
-    // 往RunLoop里面添加Source\Timer\Observer
-    [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc] init] forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] run];
-    
-    NSLog(@"%s ----end----", __func__);
+- (IBAction)stop {
+    // 在子线程调用stop
+    [self performSelector:@selector(stopThread) onThread:self.thread withObject:nil waitUntilDone:NO];
+    //waitUntilDone=NO不会等待子线程执行完直接返回。点击返回按钮，控制器销毁，delloc中调用stop，不等stopThread执行就直接结束stop，控制器销毁，然后执行stopThread中的方法，因为控制器已经销毁，会出现坏内存访问的崩溃。需要将这个参数改为YES。等子线程中的执行完，delloc才能执行完，在释放控制器。
+
 }
+
+// 用于停止子线程的RunLoop
+- (void)stopThread
+{
+    // 设置标记为NO
+    self.stopped = YES;
+    
+    // 停止RunLoop
+    CFRunLoopStop(CFRunLoopGetCurrent());
+    NSLog(@"%s %@", __func__, [NSThread currentThread]);
+}
+
+- (void)dealloc
+{
+    NSLog(@"%s", __func__);
+    
+    [self stop];
+}
+
 @end
 ```
 
